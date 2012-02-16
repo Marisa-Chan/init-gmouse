@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1329297643 source:/home/marisa/work/init-mouse/main.cpp
+	<stdio.h>
+	<stdlib.h>
+	<libusb-1.0/libusb.h>
+
