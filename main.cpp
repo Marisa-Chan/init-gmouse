@@ -48,6 +48,8 @@
 #define OSCAR_GET_DISTANCE    0x0007
 #define OSCAR_GET_OFFMODE     0x0007
 
+#define OSCAR_BUTTON_RESET    0xFFFF
+
 
 /******** Values **************/
 
@@ -55,6 +57,7 @@
 #define OSCAR_SET_VALUE_2     0xB61D
 #define OSCAR_SET_VALUE_3     0xB61A
 #define OSCAR_SET_VALUE_4     0xB60F
+#define OSCAR_SET_VALUE_5     0xB602
 
 
 #define OSCAR_GET_VALUE_1     0xB600
@@ -66,6 +69,19 @@ const uint8_t oscar_rf_bytes[15] = {OSCAR_RF_CHANNEL_AUTO, OSCAR_RF_CHANNEL_1,  
                                     OSCAR_RF_CHANNEL_10,   OSCAR_RF_CHANNEL_11, OSCAR_RF_CHANNEL_12, OSCAR_RF_CHANNEL_13, OSCAR_RF_CHANNEL_14};
 
 const uint8_t oscar_map_channel[32] = {5, 4, 9, 4, 12, 5, 3, 13, 1, 6, 6, 7, 1, 11, 10, 12, 8, 1, 7, 13, 2, 14, 12, 5, 9, 14, 11, 14, 3, 8, 10, 2};
+
+
+int set_reset_dualbtn(libusb_device_handle *dev)
+{
+    unsigned char ret[8];
+    int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
+                                           OSCAR_SET_VALUE_5, OSCAR_BUTTON_RESET, ret, 1, 0);
+    if (res == 1)
+       if (ret[0] == 0xFD)
+           return 0;
+
+    return -1;
+}
 
 int set_channel_mode(libusb_device_handle *dev, int channel)
 {
@@ -217,7 +233,7 @@ int get_mouse_current_mode(libusb_device_handle *dev)
 {
     unsigned char ret[8];
     int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
-                                           OSCAR_GET_VALUE_1 , OSCAR_GET_MRR, ret, 8, 0);
+                                           OSCAR_GET_VALUE_1 , OSCAR_GET_MODE, ret, 8, 0);
     if (res != 8)
         return -1;
 
