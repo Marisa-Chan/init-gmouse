@@ -33,16 +33,16 @@
 #define OSCAR_ON_BY_UNK       0x0080
 
 #define OSCAR_MOUSE_MODE_1    0x0000
-#define OSCAR_MOUSE_MODE_2    0x0010
-#define OSCAR_MOUSE_MODE_3    0x0020
-#define OSCAR_MOUSE_MODE_4    0x0030
-#define OSCAR_MOUSE_MODE_5    0x0040
+#define OSCAR_MOUSE_MODE_2    0x0001
+#define OSCAR_MOUSE_MODE_3    0x0002
+#define OSCAR_MOUSE_MODE_4    0x0003
+#define OSCAR_MOUSE_MODE_5    0x0004
 
 #define OSCAR_MRR_500HZ       0x0002
 #define OSCAR_MRR_250HZ       0x0004
 #define OSCAR_MRR_125HZ       0x0008
 
-#define OSCAR_GET_MODE        0x0001
+#define OSCAR_GET_PROFILE     0x0001
 #define OSCAR_GET_MRR         0x0001
 #define OSCAR_GET_CHANNEL     0x0004
 #define OSCAR_GET_DISTANCE    0x0007
@@ -58,6 +58,7 @@
 #define OSCAR_SET_VALUE_3     0xB61A
 #define OSCAR_SET_VALUE_4     0xB60F
 #define OSCAR_SET_VALUE_5     0xB602
+#define OSCAR_SET_VALUE_B614     0xB614
 
 
 #define OSCAR_GET_VALUE_1     0xB600
@@ -108,6 +109,7 @@ int get_channel_mode(libusb_device_handle *dev)
     int raw_chan = ret[2] & 0x1F;
     int chan = oscar_map_channel[raw_chan];
 
+    //0x80 bit - manual setted
     return chan | (raw_chan & 0x80);
 }
 
@@ -229,28 +231,36 @@ int get_mouse_current_mrr(libusb_device_handle *dev)
     return -1;
 }
 
-int get_mouse_current_mode(libusb_device_handle *dev)
+int get_mouse_current_profile(libusb_device_handle *dev)
 {
     unsigned char ret[8];
     int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
-                                           OSCAR_GET_VALUE_1 , OSCAR_GET_MODE, ret, 8, 0);
+                                           OSCAR_GET_VALUE_1 , OSCAR_GET_PROFILE, ret, 8, 0);
     if (res != 8)
         return -1;
 
-    if (ret[5] == OSCAR_MOUSE_MODE_1)
-        return 1;
-    else if (ret[5] == OSCAR_MOUSE_MODE_2)
-        return 2;
-    else if (ret[5] == OSCAR_MOUSE_MODE_3)
-        return 3;
-    else if (ret[5] == OSCAR_MOUSE_MODE_4)
-        return 4;
-    else if (ret[5] == OSCAR_MOUSE_MODE_5)
-        return 5;
+    int profile = (ret[5] & 0xF0) >> 4;
+
+    if (profile >= 0 && profile < 5)
+        return profile;
 
     return -1;
 }
 
+int set_mouse_current_profile(libusb_device_handle *dev,int profile)
+{
+    if (profile >= 0 && profile < 5)
+    {
+        unsigned char ret[8];
+
+        int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
+                                               OSCAR_SET_VALUE_B614 , profile, ret, 1, 0);
+        if (res == 1)
+            if (ret[0] == 0xFD)
+                return 0;
+    }
+    return -1;
+}
 
 int main()
 {
@@ -272,12 +282,12 @@ int main()
     if (dvs)
     {
 
-        //set_mouse_current_mrr(dvs,125);
+        //set_mouse_current_profile(dvs,0);
 
         while (true)
         {
 
-            int chan = get_mouse_current_mrr(dvs);
+            int chan = get_mouse_current_profile(dvs);
 
             printf("%d\n",chan);
 
