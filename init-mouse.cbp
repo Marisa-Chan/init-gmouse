@@ -29,9 +29,13 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-w" />
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Linker>
+			<Add option="-lusb-1.0" />
+		</Linker>
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<envvars />

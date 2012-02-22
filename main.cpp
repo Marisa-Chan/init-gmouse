@@ -262,6 +262,24 @@ int set_mouse_current_profile(libusb_device_handle *dev,int profile)
     return -1;
 }
 
+
+
+struct macros_instr
+{
+    char   *string;
+    uint16_t code;
+};
+
+macros_instr macro_no_params[] = {{"wheelup",0x2BFB},{"wheeldown",0x2BFC},{"leftdown",0x2501},{"leftup",0x2401},{"middledown",0x2504},
+{"middleup",0x2404},{"rightdown",0x2502},{"rightup",0x2402},{"button4down",0x2508},{"button4up",0x2408},
+{"button5down",0x2510},{"button5up",0x2410},{"rightwheeldown",0x2BEC},{"rightwheelup",0x2BED},{"leftwheeldown",0x2BEE},
+{"leftwheelup",0x2BEF},{"swingr",0x2BF0},{"swingl",0x2BF1},{"wheelup",0x2BFB},{"wheeldown",0x2BFC},
+{"stop",0x2BFD},{"null",0x2BFE},{"macroending",0x2BFF}};
+
+
+macros_instr macro_w_params[] = {{"delay",0x2800},{"delays",0x2C00},{"keydown",0x2100},{"keyup",0x2000},{"mover",0x4000},{"moverx",0x0000},{"movery",0x1000}};
+
+
 int main()
 {
 

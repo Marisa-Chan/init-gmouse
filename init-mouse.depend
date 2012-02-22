@@ -4,3 +4,9 @@
 	<stdlib.h>
 	<libusb-1.0/libusb.h>
 
+1329904714 source:/home/marisa/git/init-gmouse/main.cpp
+	<stdio.h>
+	<stdlib.h>
+	<unistd.h>
+	<libusb-1.0/libusb.h>
+
