@@ -36,6 +36,8 @@
 		<Linker>
 			<Add option="-lusb-1.0" />
 		</Linker>
+		<Unit filename="./dips.h" />
+		<Unit filename="./dpis.cpp" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<envvars />

@@ -50,18 +50,10 @@
 
 #define OSCAR_BUTTON_RESET    0xFFFF
 
+#define OSCAR_MOUSE_DISABLE   0x0001
+#define OSCAR_MOUSE_ENABLE    0x0002
 
-/******** Values **************/
-
-#define OSCAR_SET_VALUE_1     0xBE00
-#define OSCAR_SET_VALUE_2     0xB61D
-#define OSCAR_SET_VALUE_3     0xB61A
-#define OSCAR_SET_VALUE_4     0xB60F
-#define OSCAR_SET_VALUE_5     0xB602
-#define OSCAR_SET_VALUE_B614     0xB614
-
-
-#define OSCAR_GET_VALUE_1     0xB600
+#define OSCAR_SUCCESS         0xFD
 
 
 
@@ -76,9 +68,9 @@ int set_reset_dualbtn(libusb_device_handle *dev)
 {
     unsigned char ret[8];
     int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
-                                           OSCAR_SET_VALUE_5, OSCAR_BUTTON_RESET, ret, 1, 0);
+                                           0xB602, OSCAR_BUTTON_RESET, ret, 1, 0);
     if (res == 1)
-       if (ret[0] == 0xFD)
+       if (ret[0] == OSCAR_SUCCESS)
            return 0;
 
     return -1;
@@ -90,9 +82,9 @@ int set_channel_mode(libusb_device_handle *dev, int channel)
     {
         unsigned char ret[8];
         int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
-                                               OSCAR_SET_VALUE_1 + 1, oscar_rf_bytes[channel], ret, 1, 0);
+                                               0xBE01, oscar_rf_bytes[channel], ret, 1, 0);
         if (res == 1)
-            if (ret[0] == 0xFD)
+            if (ret[0] == OSCAR_SUCCESS)
                 return 0;
     }
     return -1;
@@ -102,7 +94,7 @@ int get_channel_mode(libusb_device_handle *dev)
 {
     unsigned char ret[8];
     int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
-                                           OSCAR_GET_VALUE_1 , OSCAR_GET_CHANNEL, ret, 8, 0);
+                                           0xB600 , OSCAR_GET_CHANNEL, ret, 8, 0);
     if (res != 8)
         return -1;
 
@@ -117,7 +109,7 @@ int get_channel_level(libusb_device_handle *dev)
 {
     unsigned char ret[8];
     int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
-                                           OSCAR_GET_VALUE_1 , OSCAR_GET_CHANNEL, ret, 8, 0);
+                                           0xB600 , OSCAR_GET_CHANNEL, ret, 8, 0);
     if (res != 8)
         return -1;
 
@@ -136,9 +128,9 @@ int set_mouse_rf_distance(libusb_device_handle *dev, int distance)
             distance = OSCAR_RF_DISTANCE_20;
 
         int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
-                                               OSCAR_SET_VALUE_2 , distance, ret, 1, 0);
+                                               0xB61D , distance, ret, 1, 0);
         if (res == 1)
-            if (ret[0] == 0xFD)
+            if (ret[0] == OSCAR_SUCCESS)
                 return 0;
     }
     return -1;
@@ -148,7 +140,7 @@ int get_mouse_rf_distance(libusb_device_handle *dev)
 {
     unsigned char ret[8];
     int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
-                                           OSCAR_GET_VALUE_1 , OSCAR_GET_DISTANCE, ret, 8, 0);
+                                           0xB600 , OSCAR_GET_DISTANCE, ret, 8, 0);
     if (res != 8)
         return -1;
 
@@ -172,9 +164,9 @@ int set_mouse_off_time_mode(libusb_device_handle *dev, int mode, int time)
         uint16_t setting = (mode & 0xC0) | (time & 0x3F);
 
         int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
-                                               OSCAR_SET_VALUE_3 , setting, ret, 1, 0);
+                                               0xB61A , setting, ret, 1, 0);
         if (res == 1)
-            if (ret[0] == 0xFD)
+            if (ret[0] == OSCAR_SUCCESS)
                 return 0;
     }
     return -1;
@@ -184,7 +176,7 @@ int get_mouse_off_time_mode(libusb_device_handle *dev)
 {
     unsigned char ret[8];
     int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
-                                           OSCAR_GET_VALUE_1 , OSCAR_GET_OFFMODE, ret, 8, 0);
+                                           0xB600 , OSCAR_GET_OFFMODE, ret, 8, 0);
     if (res != 8)
         return -1;
 
@@ -205,9 +197,9 @@ int set_mouse_current_mrr(libusb_device_handle *dev, int mrr)
             mrr = OSCAR_MRR_500HZ;
 
         int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
-                                               OSCAR_SET_VALUE_4 , mrr, ret, 1, 0);
+                                               0xB60F , mrr, ret, 1, 0);
         if (res == 1)
-            if (ret[0] == 0xFD)
+            if (ret[0] == OSCAR_SUCCESS)
                 return 0;
     }
     return -1;
@@ -217,7 +209,7 @@ int get_mouse_current_mrr(libusb_device_handle *dev)
 {
     unsigned char ret[8];
     int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
-                                           OSCAR_GET_VALUE_1 , OSCAR_GET_MRR, ret, 8, 0);
+                                           0xB600 , OSCAR_GET_MRR, ret, 8, 0);
     if (res != 8)
         return -1;
 
@@ -235,7 +227,7 @@ int get_mouse_current_profile(libusb_device_handle *dev)
 {
     unsigned char ret[8];
     int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
-                                           OSCAR_GET_VALUE_1 , OSCAR_GET_PROFILE, ret, 8, 0);
+                                           0xB600 , OSCAR_GET_PROFILE, ret, 8, 0);
     if (res != 8)
         return -1;
 
@@ -254,14 +246,71 @@ int set_mouse_current_profile(libusb_device_handle *dev,int profile)
         unsigned char ret[8];
 
         int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
-                                               OSCAR_SET_VALUE_B614 , profile, ret, 1, 0);
+                                               0xB614 , profile, ret, 1, 0);
         if (res == 1)
-            if (ret[0] == 0xFD)
+            if (ret[0] == OSCAR_SUCCESS)
                 return 0;
     }
     return -1;
 }
 
+
+int set_paging(libusb_device_handle *dev,unsigned short paging)
+{
+    unsigned char ret[8];
+
+    int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
+                                               0xBE0A , paging, ret, 1, 0);
+    if (res == 1)
+        if (ret[0] == OSCAR_SUCCESS)
+            return 0;
+
+    return -1;
+}
+
+int set_disable_enable_mouse(libusb_device_handle *dev,unsigned short disable)
+{
+    unsigned char ret[8];
+
+    if (disable == OSCAR_MOUSE_DISABLE || disable == OSCAR_MOUSE_ENABLE)
+    {
+        int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
+                                               0xBF01 , disable, ret, 1, 0);
+        if (res == 1)
+            if (ret[0] == OSCAR_SUCCESS)
+                return 0;
+    }
+
+    return -1;
+}
+
+int set_page(libusb_device_handle *dev,unsigned short page)
+{
+    unsigned char ret[8];
+
+    int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
+                                               0xB502 , page, ret, 1, 0);
+    if (res == 1)
+        if (ret[0] == OSCAR_SUCCESS)
+            return 0;
+
+    return -1;
+}
+
+int write_bytes_to_mouse(libusb_device_handle *dev,unsigned short addr, unsigned short word)
+{
+    unsigned char ret[8];
+
+
+
+    int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
+                                               0xB504 , page, ret, 1, 0);
+    if (res == 1)
+        if (ret[0] == OSCAR_SUCCESS)
+            return 0;
+
+    return -1;
+}
 
 
 struct macros_instr
@@ -278,6 +327,8 @@ macros_instr macro_no_params[] = {{"wheelup",0x2BFB},{"wheeldown",0x2BFC},{"left
 
 
 macros_instr macro_w_params[] = {{"delay",0x2800},{"delays",0x2C00},{"keydown",0x2100},{"keyup",0x2000},{"mover",0x4000},{"moverx",0x0000},{"movery",0x1000}};
+
+
 
 
 int main()

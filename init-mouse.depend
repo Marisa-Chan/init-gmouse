@@ -10,3 +10,12 @@
 	<unistd.h>
 	<libusb-1.0/libusb.h>
 
+1329907295 source:/home/zidane/git/init-gmouse/main.cpp
+	<stdio.h>
+	<stdlib.h>
+	<unistd.h>
+	<libusb-1.0/libusb.h>
+
+1330171732 source:/home/zidane/git/init-gmouse/dpis.cpp
+	<inttypes.h>
+
