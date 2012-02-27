@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <libusb-1.0/libusb.h>
+#include <string.h>
 
 #define USB_VENDOR_ID_A4         0x09DA
 #define USB_PRODUCT_ID_G10_700F  0x054F
@@ -297,20 +298,135 @@ int set_page(libusb_device_handle *dev,unsigned short page)
     return -1;
 }
 
-int write_bytes_to_mouse(libusb_device_handle *dev,unsigned short addr, unsigned short word)
+int write_bytes_to_mouse(libusb_device_handle *dev,unsigned short offset, unsigned short word)
 {
     unsigned char ret[8];
 
+    unsigned short realaddr = offset * 2;
 
+    unsigned short packet = (realaddr & 0xFF) | ((word & 0xFF) << 8);
 
     int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
-                                               0xB504 , page, ret, 1, 0);
+                                               0xB504 , packet, ret, 1, 0);
+    if (res != 1)
+        return -1;
+    if (ret[0] != OSCAR_SUCCESS)
+        return -1;
+
+    realaddr++;
+
+    packet = (realaddr & 0xFF) | (word & 0xFF00);
+
+    res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
+                                               0xB504 , packet, ret, 1, 0);
+
     if (res == 1)
         if (ret[0] == OSCAR_SUCCESS)
             return 0;
 
     return -1;
 }
+
+unsigned short read_bytes_from_mouse(libusb_device_handle *dev,unsigned short addr)
+{
+    unsigned char ret[8];
+
+    int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
+                                               0xB501 , addr, ret, 2, 0);
+
+    if (res != 2)
+        return 0xFFFF;
+
+    unsigned short val = ret[0] | (ret[1] << 8);
+    return val;
+}
+
+int mouse_move_block(libusb_device_handle *dev,unsigned short addr)
+{
+    unsigned char ret[8];
+
+    int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
+                                               0xB500 , addr, ret, 1, 0);
+    if (res == 1)
+        if (ret[0] == OSCAR_SUCCESS)
+            return 0;
+
+    return -1;
+}
+
+
+struct t_params
+{
+    unsigned short write_addr;
+    unsigned short checksum;
+};
+
+t_params get_3_params(libusb_device_handle *dev)
+{
+    t_params result;
+
+    unsigned char ret[8];
+
+    int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
+                                               0xB600 , 0x03, ret, 8, 0);
+
+    if (res == 8)
+    {
+        result.write_addr = ret[3] | (ret[4] << 8);
+    }
+
+    return result;
+}
+
+
+void write_config_to_mouse(libusb_device_handle *dev,unsigned short *buffer, int number)
+{
+    int to_write = 0xFFFFFF80 & (number+0x7F);
+    unsigned short *buf = (unsigned short *)malloc(to_write *2);
+    memset(buf,0xFF,to_write*2);
+
+    memcpy(buf,buffer,number*2);
+
+  //  set_paging(dev,0x80);
+
+    t_params params = get_3_params(dev);
+
+    printf("0x%x",params.write_addr);
+
+  //  set_disable_enable_mouse(dev,OSCAR_MOUSE_DISABLE);
+
+ /*   for (int i=0; i < to_write; i++)
+    {
+        if ((i & 0xFFFFFF80) == i)
+        {
+            set_page(dev,params.write_addr + i);
+        }
+
+        unsigned short j = i & 0x1F;
+
+        write_bytes_to_mouse(dev,j,buf[i]);
+
+        if (j == 0x1F)
+        {
+            mouse_move_block(dev, (params.write_addr + i) | 0x8000 );
+        }
+
+        //for (int z=0; z<)
+    }*/
+
+//    write_bytes_to_mouse(dev,0,0xA4A4);
+  //  mouse_move_block(dev, params.write_addr + 3);
+    //check
+
+    //b60e
+    //b613
+    //b60f
+
+   // set_paging(dev,0x0);
+  //  set_disable_enable_mouse(dev,OSCAR_MOUSE_ENABLE);
+    //set profile
+}
+
 
 
 struct macros_instr
@@ -329,6 +445,37 @@ macros_instr macro_no_params[] = {{"wheelup",0x2BFB},{"wheeldown",0x2BFC},{"left
 macros_instr macro_w_params[] = {{"delay",0x2800},{"delays",0x2C00},{"keydown",0x2100},{"keyup",0x2000},{"mover",0x4000},{"moverx",0x0000},{"movery",0x1000}};
 
 
+
+unsigned short config[0xF1]={0x277D, 0xFFFF, 0xFFFF, 0xA4A4, 0x0400, 0x0000, 0x0004, 0x0004,
+                         0x0017, 0x0021, 0x4040, 0x0050, 0x0026, 0x0030, 0xFFFF, 0xFFFF,
+                         0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BF9, 0x2BF8, 0x0040, 0x0000,
+                         0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+                         0x0000, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0x2BFE, 0x2BFE,
+                         0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE,
+                         0x2BFC, 0x2BFB, 0x2BFC, 0x2BFB, 0x2BFC, 0x2BFB, 0x2BFC, 0x2BFB,
+                         0x2BFC, 0x2BFB, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+                         0x4000, 0x1050, 0x1050, 0x1050, 0x1050, 0x1050, 0x0000, 0x08A0,
+                         0x08A1, 0x08A2, 0x08A3, 0x04A4, 0x4AA0, 0xFFFF, 0xFFFF, 0xFFFF,
+                         0x2BFE, 0x2BFE, 0x2502, 0x2402, 0x2504, 0x2404, 0x2508, 0x2408,
+                         0x2510, 0x2410, 0x2502, 0x2402, 0x2BFE, 0x2BFE, 0x2BFA, 0x2BFE,
+                         0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE,
+                         0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE,
+                         0x2BFE, 0x2BFE, 0x2502, 0x2402, 0x2504, 0x2404, 0x2508, 0x2408,
+                         0x2510, 0x2410, 0x2BF6, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFA, 0x2BFE,
+                         0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE,
+                         0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE,
+                         0x2BFE, 0x2BFE, 0x2502, 0x2402, 0x2504, 0x2404, 0x2508, 0x2408,
+                         0x2510, 0x2410, 0x2BF6, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFA, 0x2BFE,
+                         0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE,
+                         0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE,
+                         0x2BFE, 0x2BFE, 0x2502, 0x2402, 0x2504, 0x2404, 0x2508, 0x2408,
+                         0x2510, 0x2410, 0x2BF6, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFA, 0x2BFE,
+                         0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE,
+                         0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE,
+                         0x2BFE, 0x2BFE, 0x2502, 0x2402, 0x2504, 0x2404, 0x2508, 0x2408,
+                         0x2510, 0x2410, 0x2BF6, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFA, 0x2BFE,
+                         0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE,
+                         0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0xFFFF};
 
 
 int main()
@@ -352,6 +499,10 @@ int main()
     {
 
         //set_mouse_current_profile(dvs,0);
+
+
+	//do not use
+       // write_config_to_mouse(dvs,config,0xF1);
 
         while (true)
         {

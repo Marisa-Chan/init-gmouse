@@ -4,11 +4,12 @@
 	<stdlib.h>
 	<libusb-1.0/libusb.h>
 
-1329904714 source:/home/marisa/git/init-gmouse/main.cpp
+1330329334 source:/home/marisa/git/init-gmouse/main.cpp
 	<stdio.h>
 	<stdlib.h>
 	<unistd.h>
 	<libusb-1.0/libusb.h>
+	<string.h>
 
 1329907295 source:/home/zidane/git/init-gmouse/main.cpp
 	<stdio.h>
@@ -17,5 +18,8 @@
 	<libusb-1.0/libusb.h>
 
 1330171732 source:/home/zidane/git/init-gmouse/dpis.cpp
+	<inttypes.h>
+
+1330310272 source:/home/marisa/git/init-gmouse/dpis.cpp
 	<inttypes.h>
 
