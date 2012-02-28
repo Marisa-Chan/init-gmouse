@@ -359,11 +359,14 @@ struct t_params
 {
     unsigned short write_addr;
     unsigned short checksum;
+    unsigned short max_addr;
 };
 
 t_params get_3_params(libusb_device_handle *dev)
 {
     t_params result;
+
+    result.write_addr = 0x2000;
 
     unsigned char ret[8];
 
@@ -372,8 +375,19 @@ t_params get_3_params(libusb_device_handle *dev)
 
     if (res == 8)
     {
-        result.write_addr = ret[3] | (ret[4] << 8);
+        if (ret[3] != 0x0)
+            result.write_addr = (ret[3] << 8)| ret[4] ;
     }
+
+
+    res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
+                                               0xB600 , 0x02, ret, 8, 0);
+
+    if (res == 8)
+    {
+        result.max_addr = (ret[1] << 6) + 0xFF00 ;
+    }
+
 
     return result;
 }
@@ -381,19 +395,29 @@ t_params get_3_params(libusb_device_handle *dev)
 
 void write_config_to_mouse(libusb_device_handle *dev,unsigned short *buffer, int number)
 {
+
     int to_write = 0xFFFFFF80 & (number+0x7F);
     unsigned short *buf = (unsigned short *)malloc(to_write *2);
     memset(buf,0xFF,to_write*2);
 
     memcpy(buf,buffer,number*2);
 
-  //  set_paging(dev,0x80);
+                                                                                                                                                                                        printf("ERROR, write config is not complated, this may kill your device.");
+                                                                                                                                                                                        exit(-1);
+
+    //set_paging(dev,0x80); //WORKS_OK
 
     t_params params = get_3_params(dev);
 
-    printf("0x%x",params.write_addr);
+    printf("0x%x\n\n\n",params.write_addr);
+    printf("0x%x\n\n\n",params.max_addr);
+    if (params.write_addr < 0x1f00)
+        exit(-1);
 
-  //  set_disable_enable_mouse(dev,OSCAR_MOUSE_DISABLE);
+
+    //set_disable_enable_mouse(dev,OSCAR_MOUSE_DISABLE); //WORKS_OK
+
+    //sleep(1);
 
  /*   for (int i=0; i < to_write; i++)
     {
@@ -422,8 +446,9 @@ void write_config_to_mouse(libusb_device_handle *dev,unsigned short *buffer, int
     //b613
     //b60f
 
-   // set_paging(dev,0x0);
-  //  set_disable_enable_mouse(dev,OSCAR_MOUSE_ENABLE);
+    //set_paging(dev,0x0); //WORKS_OK
+
+    //set_disable_enable_mouse(dev,OSCAR_MOUSE_ENABLE); //WORKS_OK
     //set profile
 }
 
@@ -502,7 +527,7 @@ int main()
 
 
 	//do not use
-       // write_config_to_mouse(dvs,config,0xF1);
+        //write_config_to_mouse(dvs,config,0xF1);
 
         while (true)
         {

@@ -1,0 +1,5 @@
+DO NOT USE WRITE CONFIG, this may kill your device.
+Program designed currently for G10-700F, and not support many other mouses, but some functions may work.
+If you have "oscar" mouse, please use wireshark and virtualbox with windows to capture and compare bytes that sends by original program.
+
+Use at your own risk. There are no claims to the author in case of damage the equipment.
