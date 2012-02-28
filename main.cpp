@@ -345,6 +345,9 @@ int mouse_move_block(libusb_device_handle *dev,unsigned short addr)
 {
     unsigned char ret[8];
 
+    if (addr < 0x1f00)
+        return -1;
+
     int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
                                                0xB500 , addr, ret, 1, 0);
     if (res == 1)
@@ -502,6 +505,29 @@ unsigned short config[0xF1]={0x277D, 0xFFFF, 0xFFFF, 0xA4A4, 0x0400, 0x0000, 0x0
                          0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE,
                          0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0xFFFF};
 
+void dump_firmware_config(libusb_device_handle *dev)
+{
+        unsigned short buffff[0x2000];
+        memset(buffff,0,0x1f00*2);
+
+        for(int i=0; i<0x1f00;i++)
+        {
+            buffff[i] = read_bytes_from_mouse(dev,i);
+        }
+
+            FILE *fl=fopen("firmware","wb");
+            fwrite(buffff,0x1f00,2,fl);
+            fclose(fl);
+
+        for(int i=0; i<0x1000;i++)
+        {
+            buffff[i] = read_bytes_from_mouse(dev,i+0x1f00);
+        }
+
+            fl=fopen("config","wb");
+            fwrite(buffff,0x1000,2,fl);
+            fclose(fl);
+}
 
 int main()
 {
@@ -528,6 +554,7 @@ int main()
 
 	//do not use
         //write_config_to_mouse(dvs,config,0xF1);
+
 
         while (true)
         {
