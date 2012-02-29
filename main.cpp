@@ -4,6 +4,9 @@
 #include <libusb-1.0/libusb.h>
 #include <string.h>
 
+
+#define I_WANT_KILL_DEVICE
+
 #define USB_VENDOR_ID_A4         0x09DA
 #define USB_PRODUCT_ID_G10_700F  0x054F
 
@@ -54,7 +57,7 @@
 #define OSCAR_MOUSE_DISABLE   0x0001
 #define OSCAR_MOUSE_ENABLE    0x0002
 
-#define OSCAR_SUCCESS         0xFD
+#define OSCAR_SUCCESS         0xFB
 
 
 
@@ -357,6 +360,32 @@ int mouse_move_block(libusb_device_handle *dev,unsigned short addr)
     return -1;
 }
 
+int set_B60E(libusb_device_handle *dev,unsigned short val)
+{
+    unsigned char ret[8];
+
+    int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
+                                               0xB60E , val, ret, 1, 0);
+    if (res == 1)
+        if (ret[0] == OSCAR_SUCCESS)
+            return 0;
+
+    return -1;
+}
+
+int set_B613(libusb_device_handle *dev,unsigned short val)
+{
+    unsigned char ret[8];
+
+    int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
+                                               0xB613 , val, ret, 1, 0);
+    if (res == 1)
+        if (ret[0] == OSCAR_SUCCESS)
+            return 0;
+
+    return -1;
+}
+
 
 struct t_params
 {
@@ -396,6 +425,7 @@ t_params get_3_params(libusb_device_handle *dev)
 }
 
 
+
 void write_config_to_mouse(libusb_device_handle *dev,unsigned short *buffer, int number)
 {
 
@@ -405,54 +435,64 @@ void write_config_to_mouse(libusb_device_handle *dev,unsigned short *buffer, int
 
     memcpy(buf,buffer,number*2);
 
-                                                                                                                                                                                        printf("ERROR, write config is not complated, this may kill your device.");
-                                                                                                                                                                                        exit(-1);
+    unsigned short rate = buf[3];
+    buf[3] = 0xFFFF;
+                                                                                                                                                                                 printf("ERROR, write config is not complated, this may kill your device.");
+                                                                                                                                                                                          exit(-1);
 
-    //set_paging(dev,0x80); //WORKS_OK
+
+    t_params params1 = get_3_params(dev);
+
+//    if (params1.max_addr)
+
+    set_paging(dev,0x80); //WORKS_OK
 
     t_params params = get_3_params(dev);
 
-    printf("0x%x\n\n\n",params.write_addr);
-    printf("0x%x\n\n\n",params.max_addr);
+    //printf("0x%x\n\n\n",params.write_addr);
+   // printf("0x%x\n\n\n",params.max_addr);
     if (params.write_addr < 0x1f00)
         exit(-1);
 
 
-    //set_disable_enable_mouse(dev,OSCAR_MOUSE_DISABLE); //WORKS_OK
+    set_disable_enable_mouse(dev,OSCAR_MOUSE_DISABLE); //WORKS_OK
 
-    //sleep(1);
+    sleep(1);
 
- /*   for (int i=0; i < to_write; i++)
+    for (int i=0; i < to_write; i++)
     {
         if ((i & 0xFFFFFF80) == i)
         {
+            printf("set page 0x%x\n",params.write_addr + i);
             set_page(dev,params.write_addr + i);
         }
 
         unsigned short j = i & 0x1F;
 
-        write_bytes_to_mouse(dev,j,buf[i]);
+        printf("write bytes at 0x%x 0x%x ",j,buf[i]);
+        printf("%d \n",write_bytes_to_mouse(dev,j,buf[i]));
 
         if (j == 0x1F)
         {
-            mouse_move_block(dev, (params.write_addr + i) | 0x8000 );
+            printf("mouse_move_block to 0x%x\n",((params.write_addr + i) & 0xFFFFFFE0) | 0x8000 );
+            mouse_move_block(dev, ((params.write_addr + i) & 0xFFFFFFE0) | 0x8000 );
         }
 
         //for (int z=0; z<)
-    }*/
+    }
 
-//    write_bytes_to_mouse(dev,0,0xA4A4);
-  //  mouse_move_block(dev, params.write_addr + 3);
+    write_bytes_to_mouse(dev,0,rate);
+    mouse_move_block(dev, params.write_addr + 3);
     //check
 
-    //b60e
-    //b613
-    //b60f
+    //set_B60E(dev,01); //
+    //set_B613(dev,0x10);
+    //set_mouse_current_mrr(dev,OSCAR_MRR_125HZ);//b60f //set_current MRR
 
-    //set_paging(dev,0x0); //WORKS_OK
+    set_paging(dev,0x0); //WORKS_OK
 
-    //set_disable_enable_mouse(dev,OSCAR_MOUSE_ENABLE); //WORKS_OK
-    //set profile
+    set_disable_enable_mouse(dev,OSCAR_MOUSE_ENABLE); //WORKS_OK
+  //  set_mouse_current_profile(dev,OSCAR_MOUSE_MODE_2);
 }
 
 
@@ -505,6 +545,37 @@ unsigned short config[0xF1]={0x277D, 0xFFFF, 0xFFFF, 0xA4A4, 0x0400, 0x0000, 0x0
                          0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE,
                          0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0xFFFF};
 
+unsigned short buf2[0xF1] = {0x1FCE, 0xFFFF, 0xFFFF, 0xA4A4, 0x0100, 0x0000, 0x0004, 0x0008,
+                             0x0017, 0x0021, 0x4040, 0x0050, 0x0026, 0x0030, 0xFFFF, 0xFFFF,
+                             0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BF9, 0x2BF8, 0x0040, 0x0000,
+                             0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+                             0x0000, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0x2BFE, 0x2BFE,
+                             0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE,
+                             0x2BFC, 0x2BFB, 0x2BFC, 0x2BFB, 0x2BFC, 0x2BFB, 0x2BFC, 0x2BFB,
+                             0x2BFC, 0x2BFB, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+                             0x4000, 0x1010, 0x1050, 0x1090, 0x10D0, 0xD4D4, 0x0000, 0x00A0,
+                             0x00A1, 0x00A2, 0x00A3, 0x00A4, 0x4AA0, 0xFFFF, 0xFFFF, 0xFFFF,
+                             0x2BFE, 0x2BFE, 0x2502, 0x2402, 0x2504, 0x2404, 0x2BFE, 0x2BFE,
+                             0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFA, 0x2BFE,
+                             0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE,
+                             0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE,
+                             0x2BFE, 0x2BFE, 0x2502, 0x2402, 0x2504, 0x2404, 0x2BFE, 0x2BFE,
+                             0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFA, 0x2BFE,
+                             0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE,
+                             0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE,
+                             0x2BFE, 0x2BFE, 0x2502, 0x2402, 0x2504, 0x2404, 0x2BFE, 0x2BFE,
+                             0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFA, 0x2BFE,
+                             0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE,
+                             0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE,
+                             0x2BFE, 0x2BFE, 0x2502, 0x2402, 0x2504, 0x2404, 0x2BFE, 0x2BFE,
+                             0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFA, 0x2BFE,
+                             0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE,
+                             0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE,
+                             0x2BFE, 0x2BFE, 0x2502, 0x2402, 0x2504, 0x2404, 0x2BFE, 0x2BFE,
+                             0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFA, 0x2BFE,
+                             0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE,
+                             0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0x2BFE, 0xFFFF};
+
 void dump_firmware_config(libusb_device_handle *dev)
 {
         unsigned short buffff[0x2000];
@@ -553,7 +624,9 @@ int main()
 
 
 	//do not use
-        //write_config_to_mouse(dvs,config,0xF1);
+      //  write_config_to_mouse(dvs,buf2,0xF1);
+
+     //   dump_firmware_config(dvs);
 
 
         while (true)
