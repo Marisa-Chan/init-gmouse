@@ -259,7 +259,7 @@ int set_mouse_current_profile(libusb_device_handle *dev,int profile)
 }
 
 
-int set_paging(libusb_device_handle *dev,unsigned short paging)
+int set_unknown(libusb_device_handle *dev,unsigned short paging)
 {
     unsigned char ret[8];
 
@@ -288,7 +288,7 @@ int set_disable_enable_mouse(libusb_device_handle *dev,unsigned short disable)
     return -1;
 }
 
-int set_page(libusb_device_handle *dev,unsigned short page)
+int write_FFFF_0x80_block(libusb_device_handle *dev,unsigned short page)
 {
     unsigned char ret[8];
 
@@ -445,7 +445,7 @@ void write_config_to_mouse(libusb_device_handle *dev,unsigned short *buffer, int
 
 //    if (params1.max_addr)
 
-    set_paging(dev,0x80); //WORKS_OK
+    set_unknown(dev,0x80); //WORKS_OK
 
     t_params params = get_3_params(dev);
 
@@ -464,7 +464,7 @@ void write_config_to_mouse(libusb_device_handle *dev,unsigned short *buffer, int
         if ((i & 0xFFFFFF80) == i)
         {
             printf("set page 0x%x\n",params.write_addr + i);
-            set_page(dev,params.write_addr + i);
+            write_FFFF_0x80_block(dev,params.write_addr + i);
         }
 
         unsigned short j = i & 0x1F;
@@ -489,7 +489,7 @@ void write_config_to_mouse(libusb_device_handle *dev,unsigned short *buffer, int
     //set_B613(dev,0x10);
     //set_mouse_current_mrr(dev,OSCAR_MRR_125HZ);//b60f //set_current MRR
 
-    set_paging(dev,0x0); //WORKS_OK
+    set_unknown(dev,0x0); //WORKS_OK
 
     set_disable_enable_mouse(dev,OSCAR_MOUSE_ENABLE); //WORKS_OK
   //  set_mouse_current_profile(dev,OSCAR_MOUSE_MODE_2);
