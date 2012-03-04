@@ -292,6 +292,9 @@ int write_FFFF_0x80_block(libusb_device_handle *dev,unsigned short page)
 {
     unsigned char ret[8];
 
+    if (page < 0x1f00)
+        return -1;
+
     int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
                                                0xB502 , page, ret, 1, 0);
     if (res == 1)
