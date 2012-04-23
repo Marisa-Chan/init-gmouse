@@ -187,15 +187,28 @@ int main()
     if (dvs)
     {
 
-        //a4_dump(dvs,"g10_dump");
-       /* for (int i=1; i<=8; i++)
+        /*a4_dump(dvs,"g9_dump2");*/
+        a4_pair_set_find_mode(dvs,A4_PAIR_FIND_ON);
+
+        while(true)
+        {
+            a4_pair_device dev = a4_pair_get_new_device(dvs);
+            if (dev.type != A4_PAIR_NONE)
+            {
+                printf("%.8x\n",dev.ID);
+                sleep(1);
+            }
+
+        }
+        /*for (int i=1; i<=8; i++)
         {
             unsigned char ret[8];
             int res = a4_dongle_read(dvs, 0xB600 , i, ret, 8);
 
             printf("%d: %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x\n",i,ret[0],ret[1],ret[2],ret[3],ret[4],ret[5],ret[6],ret[7]);
-        }
+        }*/
         //set_B60E(dvs->dev,0x00);
+        /*
         for (int i=1; i<=8; i++)
         {
             unsigned char ret[8];

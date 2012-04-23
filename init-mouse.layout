@@ -1,25 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="./control_a4.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="1271" topLine="239" />
+	<File name="./control_a4.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="0" topLine="244" />
 	</File>
 	<File name="control_a4.h" open="1" top="0" tabpos="2">
 		<Cursor position="482" topLine="0" />
 	</File>
 	<File name="main.cpp" open="1" top="1" tabpos="1">
-		<Cursor position="5201" topLine="153" />
+		<Cursor position="5506" topLine="198" />
 	</File>
-	<File name="./mouse_memory.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="1868" topLine="73" />
+	<File name="./mouse_memory.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="0" topLine="103" />
 	</File>
-	<File name="./mouse_memory.h" open="1" top="0" tabpos="6">
-		<Cursor position="421" topLine="0" />
-	</File>
-	<File name="./system_a4.cpp" open="1" top="0" tabpos="5">
-		<Cursor position="614" topLine="0" />
-	</File>
-	<File name="./system_a4.h" open="1" top="0" tabpos="7">
-		<Cursor position="525" topLine="0" />
+	<File name="./pairing.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="1054" topLine="15" />
 	</File>
 </CodeBlocks_layout_file>

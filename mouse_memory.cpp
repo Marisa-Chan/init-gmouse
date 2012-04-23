@@ -79,7 +79,36 @@ unsigned short a4_mem_read_word(a4_device *dev, unsigned short addr)
     return val;
 }
 
-int a4_mem_read_block(a4_device *dev, unsigned short addr, unsigned short words_sz, void *buf)
+int a4_mem_read_block(a4_device *dev, unsigned short addr, unsigned short words_sz, void *buf,void (*progress)(int))
+{
+    if (!dev)
+        return A4_ERROR;
+
+    unsigned short *sbuf = (unsigned short *)buf;
+
+    int big   = words_sz / 4;
+    int small = words_sz % 4;
+
+    for(int i = 0; i < big; i++)
+    {
+        int res = a4_dongle_read(dev, 0xB501, addr + (i*4), sbuf + (i*4), 8);
+
+        if (res != 8)
+            return A4_ERROR;
+    }
+
+    for(int i = 0; i < small; i++)
+    {
+        int res = a4_dongle_read(dev, 0xB501, addr + (big * 4) + i, sbuf + (big * 4) + i, 2);
+
+        if (res != 2)
+            return A4_ERROR;
+    }
+
+    return A4_SUCCESS;
+}
+
+int a4_mem_write_block(a4_device *dev, unsigned short addr, unsigned short words_sz, void *buf)
 {
     if (!dev)
         return A4_ERROR;

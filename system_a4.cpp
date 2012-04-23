@@ -113,7 +113,7 @@ int a4_dump(a4_device *dev, const char *file)
 
     unsigned short *buf[0x4000];
 
-    a4_mem_read_block(dev,0,0x4000,buf);
+    a4_mem_read_block(dev,0,0x4000,buf,NULL);
 
     fwrite(buf,0x4000,2,f);
 
