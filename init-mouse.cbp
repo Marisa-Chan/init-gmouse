@@ -36,9 +36,17 @@
 		<Linker>
 			<Add option="-lusb-1.0" />
 		</Linker>
+		<Unit filename="./control_a4.cpp" />
+		<Unit filename="control_a4.h" />
 		<Unit filename="./dips.h" />
 		<Unit filename="./dpis.cpp" />
 		<Unit filename="main.cpp" />
+		<Unit filename="./mouse_memory.cpp" />
+		<Unit filename="./mouse_memory.h" />
+		<Unit filename="./pairing.cpp" />
+		<Unit filename="./pairing.h" />
+		<Unit filename="./system_a4.cpp" />
+		<Unit filename="./system_a4.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />
