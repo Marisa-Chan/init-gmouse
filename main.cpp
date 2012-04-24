@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <libusb-1.0/libusb.h>
 #include <string.h>
+#include "./mouse_memory.h"
 
 
 //int set_unknown(libusb_device_handle *dev,unsigned short paging)
@@ -169,10 +170,11 @@ struct macros_instr
 };
 
 macros_instr macro_no_params[] = {{"wheelup",0x2BFB},{"wheeldown",0x2BFC},{"leftdown",0x2501},{"leftup",0x2401},{"middledown",0x2504},
-{"middleup",0x2404},{"rightdown",0x2502},{"rightup",0x2402},{"button4down",0x2508},{"button4up",0x2408},
-{"button5down",0x2510},{"button5up",0x2410},{"rightwheeldown",0x2BEC},{"rightwheelup",0x2BED},{"leftwheeldown",0x2BEE},
-{"leftwheelup",0x2BEF},{"swingr",0x2BF0},{"swingl",0x2BF1},{"wheelup",0x2BFB},{"wheeldown",0x2BFC},
-{"stop",0x2BFD},{"null",0x2BFE},{"macroending",0x2BFF}};
+    {"middleup",0x2404},{"rightdown",0x2502},{"rightup",0x2402},{"button4down",0x2508},{"button4up",0x2408},
+    {"button5down",0x2510},{"button5up",0x2410},{"rightwheeldown",0x2BEC},{"rightwheelup",0x2BED},{"leftwheeldown",0x2BEE},
+    {"leftwheelup",0x2BEF},{"swingr",0x2BF0},{"swingl",0x2BF1},{"wheelup",0x2BFB},{"wheeldown",0x2BFC},
+    {"stop",0x2BFD},{"null",0x2BFE},{"macroending",0x2BFF}
+};
 
 
 macros_instr macro_w_params[] = {{"delay",0x2800},{"delays",0x2C00},{"keydown",0x2100},{"keyup",0x2000},{"mover",0x4000},{"moverx",0x0000},{"movery",0x1000}};
@@ -187,36 +189,54 @@ int main()
     if (dvs)
     {
 
-        /*a4_dump(dvs,"g9_dump2");*/
         a4_pair_set_find_mode(dvs,A4_PAIR_FIND_ON);
 
         while(true)
         {
-            a4_pair_device dev = a4_pair_get_new_device(dvs);
-            if (dev.type != A4_PAIR_NONE)
+            a4_pair_device tmp = a4_pair_get_new_device(dvs);
+
+            if (tmp.type != A4_PAIR_NONE)
             {
-                printf("%.8x\n",dev.ID);
-                sleep(1);
+                a4_pair_add_new_device(dvs,tmp);
+
+                break;
             }
-
+            sleep(1);
         }
-        /*for (int i=1; i<=8; i++)
-        {
-            unsigned char ret[8];
-            int res = a4_dongle_read(dvs, 0xB600 , i, ret, 8);
 
-            printf("%d: %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x\n",i,ret[0],ret[1],ret[2],ret[3],ret[4],ret[5],ret[6],ret[7]);
-        }*/
-        //set_B60E(dvs->dev,0x00);
-        /*
-        for (int i=1; i<=8; i++)
-        {
-            unsigned char ret[8];
-            int res = a4_dongle_read(dvs, 0xB600 , i, ret, 8);
+        a4_pair_set_find_mode(dvs,A4_PAIR_FIND_OFF);
 
-            printf("%d: %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x\n",i,ret[0],ret[1],ret[2],ret[3],ret[4],ret[5],ret[6],ret[7]);
-        }*/
-        //set_unknown(dvs->dev,0x00);
+
+        a4_pair_devlist tt =  a4_pair_get_list_mouse(dvs);
+        a4_pair_devlist tt2 =  a4_pair_get_list_keyboard(dvs);
+
+        printf("Mouses:\n");
+        for (int i=0; i<5; i++)
+        {
+            if (tt.ID[i] != A4_PAIR_NONE)
+            {
+                if (tt.disabled[i] == A4_PAIR_STATE_ENABLE)
+                    printf("+ ");
+                else
+                    printf("- ");
+                printf("%.8x\n",tt.ID[i]);
+            }
+        }
+        printf("Keyboards:\n");
+        for (int i=0; i<5; i++)
+        {
+            if (tt2.ID[i] != A4_PAIR_NONE)
+            {
+                if (tt2.disabled[i] == A4_PAIR_STATE_ENABLE)
+                    printf("+ ");
+                else
+                    printf("- ");
+                printf("%.8x\n",tt2.ID[i]);
+            }
+        }
+
+        //a4_pair_del_device_by_id(dvs,0x000172f7);
+
     }
 
     a4_close_device(dvs);

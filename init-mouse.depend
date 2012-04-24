@@ -4,7 +4,7 @@
 	<stdlib.h>
 	<libusb-1.0/libusb.h>
 
-1335175484 source:/home/marisa/git/init-gmouse/main.cpp
+1335262762 source:/home/marisa/git/init-gmouse/main.cpp
 	<stdio.h>
 	<stdlib.h>
 	"system_a4.h"
@@ -12,6 +12,7 @@
 	<unistd.h>
 	<libusb-1.0/libusb.h>
 	<string.h>
+	"./mouse_memory.h"
 
 1334654917 source:/home/zidane/git/init-gmouse/main.cpp
 	<stdio.h>
@@ -135,26 +136,32 @@
 1335145951 source:/home/marisa/git/init-gmouse/control_a4.cpp
 	"control_a4.h"
 
-1335145951 /home/marisa/git/init-gmouse/control_a4.h
+1335249534 /home/marisa/git/init-gmouse/control_a4.h
 	"system_a4.h"
 
-1335145951 /home/marisa/git/init-gmouse/system_a4.h
+1335249001 /home/marisa/git/init-gmouse/system_a4.h
 	<libusb-1.0/libusb.h>
+	<stdlib.h>
 
-1335145951 /home/marisa/git/init-gmouse/pairing.h
+1335262007 /home/marisa/git/init-gmouse/pairing.h
 	"system_a4.h"
 
-1335172860 source:/home/marisa/git/init-gmouse/mouse_memory.cpp
+1335249995 source:/home/marisa/git/init-gmouse/mouse_memory.cpp
 	"system_a4.h"
+	<string.h>
+	<stdio.h>
 
-1335145951 source:/home/marisa/git/init-gmouse/pairing.cpp
+1335262261 source:/home/marisa/git/init-gmouse/pairing.cpp
 	"pairing.h"
+	"control_a4.h"
+	"mouse_memory.h"
+	<stdio.h>
 
-1335175492 source:/home/marisa/git/init-gmouse/system_a4.cpp
+1335262425 source:/home/marisa/git/init-gmouse/system_a4.cpp
 	"system_a4.h"
 	"mouse_memory.h"
 	<unistd.h>
 	<stdio.h>
 
-1335172863 /home/marisa/git/init-gmouse/mouse_memory.h
+1335249354 /home/marisa/git/init-gmouse/mouse_memory.h
 

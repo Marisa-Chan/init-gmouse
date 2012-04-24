@@ -8,6 +8,8 @@
 
 #define OSCAR_SUCCESS             0xFB
 
+#define SLEEPTIME                 7000
+
 a4_device *a4_open_device()
 {
     a4_device *dv = new a4_device;
@@ -57,14 +59,14 @@ int a4_dongle_read(a4_device *dev, unsigned short address, unsigned short pin, v
             int res = libusb_control_transfer(dev->dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
                                               address , pin, (unsigned char *)buffer, bf_size, 1000);
 
-            usleep(10000);
+            usleep(SLEEPTIME);
 
             if (res < 0)
             {
                 res = libusb_control_transfer(dev->dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
                                               address , pin, (unsigned char *)buffer, bf_size, 1000);
 
-                usleep(10000);
+                usleep(SLEEPTIME);
             }
 
             if (res > 0)
@@ -84,14 +86,14 @@ int a4_dongle_write(a4_device *dev, unsigned short addr_pin, unsigned short word
             int res = libusb_control_transfer(dev->dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
                                               addr_pin , word, ret, 1, 1000);
 
-            usleep(10000);
+            usleep(SLEEPTIME);
 
             if (res < 0)
             {
                 res = libusb_control_transfer(dev->dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
                                               addr_pin , word, ret, 1, 1000);
 
-                usleep(10000);
+                usleep(SLEEPTIME);
             }
 
             if (res == 1)

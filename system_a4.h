@@ -1,7 +1,8 @@
-#include <libusb-1.0/libusb.h>
-
 #ifndef SYSTEM_A4_H_INCLUDED
 #define SYSTEM_A4_H_INCLUDED
+
+#include <libusb-1.0/libusb.h>
+#include <stdlib.h>
 
 #define A4_ERROR    -1
 #define A4_SUCCESS   0

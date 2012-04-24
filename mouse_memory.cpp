@@ -1,4 +1,6 @@
 #include "system_a4.h"
+#include <string.h>
+#include <stdio.h>
 
 //erase 0x100 block
 int a4_mem_erase_block(a4_device *dev, unsigned short page)
@@ -6,7 +8,7 @@ int a4_mem_erase_block(a4_device *dev, unsigned short page)
     if (!dev)
         return A4_ERROR;
 
-    if ((page & 0x3FFF) < 0x1f00)
+    if ((page & 0x3FFF) < 0x1f00 && page >= 0x4000)
         return A4_ERROR;
 
     return a4_dongle_write(dev, 0xB502, page);
@@ -108,31 +110,38 @@ int a4_mem_read_block(a4_device *dev, unsigned short addr, unsigned short words_
     return A4_SUCCESS;
 }
 
-int a4_mem_write_block(a4_device *dev, unsigned short addr, unsigned short words_sz, void *buf)
+int a4_mem_write_block(a4_device *dev, unsigned short addr, unsigned short words_sz, void *inbuf)
 {
     if (!dev)
         return A4_ERROR;
 
-    unsigned short *sbuf = (unsigned short *)buf;
+    int to_write = 0xFFFFFF80 & (words_sz+0x7F);
+    unsigned short *buf = (unsigned short *)malloc(to_write *2);
+    memset(buf,0xFF,to_write*2);
 
-    int big   = words_sz / 4;
-    int small = words_sz % 4;
+    memcpy(buf,inbuf,words_sz*2);
 
-    for(int i = 0; i < big; i++)
+    int error = A4_SUCCESS;
+
+    for (int i=0; i < to_write && error == A4_SUCCESS; i++)
     {
-        int res = a4_dongle_read(dev, 0xB501, addr + (i*4), sbuf + (i*4), 8);
+        if ((i & 0xFFFFFF80) == i)
+        {
+            //printf("set page 0x%x\n",addr + i);
+            error = a4_mem_erase_block(dev,addr + i);
+        }
 
-        if (res != 8)
-            return A4_ERROR;
+        unsigned short j = i & 0x1F;
+
+        //printf("write at pos %.2x word 0x%.4x\n",j,buf[i]);
+        error = a4_mem_write_word(dev,j,buf[i]);
+
+        if (j == 0x1F)
+        {
+            //printf("mouse_move_block to 0x%x\n",((addr + i) & 0xFFFFFFE0) | 0x8000 );
+            error = a4_mem_mov_block(dev, ((addr + i) & 0xFFFFFFE0) | 0x8000 );
+        }
     }
 
-    for(int i = 0; i < small; i++)
-    {
-        int res = a4_dongle_read(dev, 0xB501, addr + (big * 4) + i, sbuf + (big * 4) + i, 2);
-
-        if (res != 2)
-            return A4_ERROR;
-    }
-
-    return A4_SUCCESS;
+    return error;
 }

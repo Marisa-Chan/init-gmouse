@@ -24,4 +24,6 @@ a4_wake_mode a4_wake_get_mode(a4_device *dev);
 #define A4_LOCK_ON   0x0001
 #define A4_LOCK_OFF  0x0002
 
+int a4_lock_mouse(a4_device *dev, unsigned short lock);
+
 #endif // CONROL_A4_H_INCLUDED
