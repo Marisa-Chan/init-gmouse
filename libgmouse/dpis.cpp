@@ -18,7 +18,7 @@ const uint16_t dpi_opcodes[DPI_H_CNT][DPI_W_CNT] =
                                         {0x50C1,0x50C2,0x50C4,0x50C6,0x50C8,0x50CA,0x50CC,0x50CE,0x10D0,0x50D4},
                                         {0xD4C1,0xD4C2,0xD4C4,0xD4C6,0xD4C8,0xD4CA,0xD4CC,0xD4CE,0x94D0,0xD4D4}};
 
-const uint8_t dpi_sizes[DPI_H_CNT] = {100,200,400,600,800,1000,1200,1400,1600,2000};
+const int32_t dpi_sizes[DPI_H_CNT] = {100,200,400,600,800,1000,1200,1400,1600,2000};
 
 
 uint16_t get_dpi(int8_t dpi_w, int8_t dpi_h)

@@ -77,8 +77,6 @@ int a4_rf_set_distance(a4_device *dev, int distance)
 
     if (distance == OSCAR_RF_DISTANCE_20 || distance == OSCAR_RF_DISTANCE_15 || distance == 15 || distance == 20)
     {
-        unsigned char ret[8];
-
         if (distance == 15)
             distance = OSCAR_RF_DISTANCE_15;
         else if (distance == 20)

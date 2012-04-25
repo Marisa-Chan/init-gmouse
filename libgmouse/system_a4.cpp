@@ -120,4 +120,6 @@ int a4_dump(a4_device *dev, const char *file)
     fwrite(buf,0x4000,2,f);
 
     fclose(f);
+
+    return A4_SUCCESS;
 }

@@ -37,10 +37,12 @@ a4_pair_device a4_pair_get_new_device(a4_device *dev)
 int a4_pair_set_find_mode(a4_device *dev, unsigned short mod)
 {
     if (!dev)
-        A4_ERROR;
+        return A4_ERROR;
 
     if (mod == A4_PAIR_FIND_ON || mod == A4_PAIR_FIND_OFF)
         return a4_dongle_write(dev, 0xBF02, mod);
+
+    return A4_ERROR;
 }
 
 static unsigned short a4_pair_addr_mouse[5] = {0x2772, 0x2720, 0x2728, 0x2730, 0x2738};
@@ -244,6 +246,72 @@ int a4_pair_add_new_device(a4_device *dev, a4_pair_device new_device)
     return A4_PAIR_MOD_ER_MAX;
 }
 
+int a4_pair_add_new_mouse(a4_device *dev, unsigned int new_device_id)
+{
+    if (!dev)
+        return A4_PAIR_MOD_IO;
+
+    if (((new_device_id & 0x7FFFF) != new_device_id) || new_device_id == 0 || new_device_id == A4_PAIR_NONE)
+        return A4_PAIR_MOD_INVALID;
+
+    a4_pair_devlist ms = a4_pair_get_list_mouse(dev);
+    a4_pair_devlist kb = a4_pair_get_list_keyboard(dev);
+
+    if (ms.type != A4_PAIR_MOUSE || kb.type != A4_PAIR_KBD)
+        return A4_PAIR_MOD_IO;
+
+    for (int i=0; i<5; i++)
+        if (ms.ID[i] == new_device_id || kb.ID[i] == new_device_id)
+            return A4_PAIR_MOD_EXIST;
+
+    for (int i=0; i<5; i++)
+        if (ms.ID[i] == A4_PAIR_NONE || ms.ID[i] == 0)
+        {
+            ms.disabled[i] = A4_PAIR_STATE_ENABLE;
+            ms.ID[i]       = new_device_id;
+
+            if (a4_pair_write_devices_ids(dev,ms,kb) == A4_SUCCESS)
+                return A4_PAIR_MOD_OK;
+            else
+                return A4_PAIR_MOD_WRITE;
+        }
+
+    return A4_PAIR_MOD_ER_MAX;
+}
+
+int a4_pair_add_new_keybd(a4_device *dev, unsigned int new_device_id)
+{
+    if (!dev)
+        return A4_PAIR_MOD_IO;
+
+    if (((new_device_id & 0x7FFFF) != new_device_id) || new_device_id == 0 || new_device_id == A4_PAIR_NONE)
+        return A4_PAIR_MOD_INVALID;
+
+    a4_pair_devlist ms = a4_pair_get_list_mouse(dev);
+    a4_pair_devlist kb = a4_pair_get_list_keyboard(dev);
+
+    if (ms.type != A4_PAIR_MOUSE || kb.type != A4_PAIR_KBD)
+        return A4_PAIR_MOD_IO;
+
+    for (int i=0; i<5; i++)
+        if (ms.ID[i] == new_device_id || kb.ID[i] == new_device_id)
+            return A4_PAIR_MOD_EXIST;
+
+    for (int i=0; i<5; i++)
+        if (kb.ID[i] == A4_PAIR_NONE || kb.ID[i] == 0)
+        {
+            kb.disabled[i] = A4_PAIR_STATE_ENABLE;
+            kb.ID[i]       = new_device_id;
+
+            if (a4_pair_write_devices_ids(dev,ms,kb) == A4_SUCCESS)
+                return A4_PAIR_MOD_OK;
+            else
+                return A4_PAIR_MOD_WRITE;
+        }
+
+    return A4_PAIR_MOD_ER_MAX;
+}
+
 int a4_pair_del_device_by_id(a4_device *dev, unsigned int dev_id)
 {
     if (!dev)
@@ -283,6 +351,58 @@ int a4_pair_del_device_by_id(a4_device *dev, unsigned int dev_id)
     }
 
     return A4_PAIR_MOD_NOTFND;
+}
+
+int a4_pair_del_mouse_by_index(a4_device *dev, int index)
+{
+    if (!dev)
+        return A4_PAIR_MOD_IO;
+
+    if (index < 0 || index > 4)
+        return A4_PAIR_MOD_INVALID;
+
+    a4_pair_devlist ms = a4_pair_get_list_mouse(dev);
+    a4_pair_devlist kb = a4_pair_get_list_keyboard(dev);
+
+    if (ms.type != A4_PAIR_MOUSE || kb.type != A4_PAIR_KBD)
+        return A4_PAIR_MOD_IO;
+
+    if (((ms.ID[index] & 0x7FFFF) != ms.ID[index]) || ms.ID[index] == 0 || ms.ID[index] == A4_PAIR_NONE)
+        return A4_PAIR_MOD_NOTFND;
+
+    ms.disabled[index] = A4_PAIR_STATE_ENABLE;
+    ms.ID[index]       = A4_PAIR_NONE;
+
+    if (a4_pair_write_devices_ids(dev,ms,kb) != A4_SUCCESS)
+        return A4_PAIR_MOD_WRITE;
+
+    return A4_PAIR_MOD_OK;
+}
+
+int a4_pair_del_keybd_by_index(a4_device *dev, int index)
+{
+    if (!dev)
+        return A4_PAIR_MOD_IO;
+
+    if (index < 0 || index > 4)
+        return A4_PAIR_MOD_INVALID;
+
+    a4_pair_devlist ms = a4_pair_get_list_mouse(dev);
+    a4_pair_devlist kb = a4_pair_get_list_keyboard(dev);
+
+    if (ms.type != A4_PAIR_MOUSE || kb.type != A4_PAIR_KBD)
+        return A4_PAIR_MOD_IO;
+
+    if (((kb.ID[index] & 0x7FFFF) != kb.ID[index]) || kb.ID[index] == 0 || kb.ID[index] == A4_PAIR_NONE)
+        return A4_PAIR_MOD_NOTFND;
+
+    kb.disabled[index] = A4_PAIR_STATE_ENABLE;
+    kb.ID[index]       = A4_PAIR_NONE;
+
+    if (a4_pair_write_devices_ids(dev,ms,kb) != A4_SUCCESS)
+        return A4_PAIR_MOD_WRITE;
+
+    return A4_PAIR_MOD_OK;
 }
 
 int a4_pair_switch_device_by_id(a4_device *dev, unsigned int dev_id, bool state)
@@ -385,3 +505,42 @@ int a4_pair_switch_keybd_by_index(a4_device *dev, int index, bool state)
 
     return A4_PAIR_MOD_OK;
 }
+
+static const char *a4_pair_errstr[] =
+{
+    "Success",
+    "Write error",
+    "This device already added",
+    "Fail, maximum 5 mouses and 5 keyboards",
+    "IO errors",
+    "Invalid device ID",
+    "Not found",
+    "Unknown error!",
+    ""
+};
+
+const char *a4_pair_get_error_string(int error)
+{
+    switch (error)
+    {
+    case A4_PAIR_MOD_OK:
+        return a4_pair_errstr[0];
+    case A4_PAIR_MOD_WRITE:
+        return a4_pair_errstr[1];
+    case A4_PAIR_MOD_EXIST:
+        return a4_pair_errstr[2];
+    case A4_PAIR_MOD_ER_MAX:
+        return a4_pair_errstr[3];
+    case A4_PAIR_MOD_IO:
+        return a4_pair_errstr[4];
+    case A4_PAIR_MOD_INVALID:
+        return a4_pair_errstr[5];
+    case A4_PAIR_MOD_NOTFND:
+        return a4_pair_errstr[6];
+    default:
+        return a4_pair_errstr[7];
+    }
+
+    return a4_pair_errstr[8];
+}
+

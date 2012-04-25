@@ -2,25 +2,31 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="init-mouse" />
+		<Option title="libgmouse" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/init-mouse" prefix_auto="1" extension_auto="1" />
+				<Option output="libgmouse" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
 				<Option object_output="obj/Debug/" />
-				<Option type="1" />
+				<Option type="2" />
 				<Option compiler="gcc" />
+				<Option createDefFile="1" />
 				<Compiler>
+					<Add option="-Wall" />
 					<Add option="-g" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/init-mouse" prefix_auto="1" extension_auto="1" />
+				<Option output="libgmouse" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
 				<Option object_output="obj/Release/" />
-				<Option type="1" />
+				<Option type="2" />
 				<Option compiler="gcc" />
+				<Option createDefFile="1" />
 				<Compiler>
+					<Add option="-Wall" />
 					<Add option="-O2" />
 				</Compiler>
 				<Linker>
@@ -28,25 +34,19 @@
 				</Linker>
 			</Target>
 		</Build>
-		<Compiler>
-			<Add option="-w" />
-			<Add option="-Wall" />
-			<Add option="-fexceptions" />
-		</Compiler>
 		<Linker>
 			<Add option="-lusb-1.0" />
 		</Linker>
-		<Unit filename="./control_a4.cpp" />
+		<Unit filename="control_a4.cpp" />
 		<Unit filename="control_a4.h" />
-		<Unit filename="./dips.h" />
-		<Unit filename="./dpis.cpp" />
-		<Unit filename="main.cpp" />
-		<Unit filename="./mouse_memory.cpp" />
-		<Unit filename="./mouse_memory.h" />
-		<Unit filename="./pairing.cpp" />
-		<Unit filename="./pairing.h" />
-		<Unit filename="./system_a4.cpp" />
-		<Unit filename="./system_a4.h" />
+		<Unit filename="dips.h" />
+		<Unit filename="dpis.cpp" />
+		<Unit filename="mouse_memory.cpp" />
+		<Unit filename="mouse_memory.h" />
+		<Unit filename="pairing.cpp" />
+		<Unit filename="pairing.h" />
+		<Unit filename="system_a4.cpp" />
+		<Unit filename="system_a4.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

@@ -125,10 +125,11 @@ int a4_mem_write_block(a4_device *dev, unsigned short addr, unsigned short words
 
     for (int i=0; i < to_write && error == A4_SUCCESS; i++)
     {
-        if ((i & 0xFFFFFF80) == i)
+        unsigned int k = i;
+        if ((k & 0xFFFFFF80) == k)
         {
             //printf("set page 0x%x\n",addr + i);
-            error = a4_mem_erase_block(dev,addr + i);
+            error = a4_mem_erase_block(dev,addr + k);
         }
 
         unsigned short j = i & 0x1F;

@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "system_a4.h"
-#include "pairing.h"
+#include "./include/system_a4.h"
+#include "./include/pairing.h"
 
 #include <unistd.h>
 #include <libusb-1.0/libusb.h>
 #include <string.h>
-#include "./mouse_memory.h"
+#include "./include/mouse_memory.h"
 
 
 //int set_unknown(libusb_device_handle *dev,unsigned short paging)
@@ -188,25 +188,6 @@ int main()
 
     if (dvs)
     {
-
-        a4_pair_set_find_mode(dvs,A4_PAIR_FIND_ON);
-
-        while(true)
-        {
-            a4_pair_device tmp = a4_pair_get_new_device(dvs);
-
-            if (tmp.type != A4_PAIR_NONE)
-            {
-                a4_pair_add_new_device(dvs,tmp);
-
-                break;
-            }
-            sleep(1);
-        }
-
-        a4_pair_set_find_mode(dvs,A4_PAIR_FIND_OFF);
-
-
         a4_pair_devlist tt =  a4_pair_get_list_mouse(dvs);
         a4_pair_devlist tt2 =  a4_pair_get_list_keyboard(dvs);
 
@@ -234,9 +215,6 @@ int main()
                 printf("%.8x\n",tt2.ID[i]);
             }
         }
-
-        //a4_pair_del_device_by_id(dvs,0x000172f7);
-
     }
 
     a4_close_device(dvs);

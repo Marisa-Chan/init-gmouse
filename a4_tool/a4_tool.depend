@@ -1,0 +1,16 @@
+# depslib dependency file v1.0
+1335345384 source:/home/marisa/git/init-gmouse/a4_tool/main.cpp
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<unistd.h>
+	"system_a4.h"
+	"pairing.h"
+
+1335249001 /home/marisa/git/init-gmouse/include/system_a4.h
+	<libusb-1.0/libusb.h>
+	<stdlib.h>
+
+1335326460 /home/marisa/git/init-gmouse/include/pairing.h
+	"system_a4.h"
+
