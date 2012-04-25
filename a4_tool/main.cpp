@@ -5,6 +5,10 @@
 
 #include "system_a4.h"
 #include "pairing.h"
+#include "control_a4.h"
+
+#define LITLE_SLEEP   250000
+
 
 typedef int (*func)(a4_device *dev, int argc, char *argv[]);
 
@@ -47,6 +51,80 @@ static funcs functions[] =
 
 int channel_func(a4_device *dev, int argc, char *argv[])
 {
+    if (argc > 0)
+    {
+        if (strcmp(argv[0],"get") == 0)
+        {
+            int chn = a4_rf_get_channel(dev);
+
+            if (chn == A4_ERROR)
+            {
+                fprintf(stderr, "IO Error\n");
+                return EXIT_FAILURE;
+            }
+
+            bool manual = ((chn & 0x80) == 0x80);
+            int  channel = chn & 0x7F;
+
+            printf("Channel: %d", channel);
+
+            if (manual)
+                printf(" manual\n");
+            else
+                printf(" auto\n");
+        }
+        else if (strcmp(argv[0],"set") == 0)
+        {
+            if (argc < 2)
+            {
+                fprintf(stderr, "No channel number specified\n");
+                return EXIT_FAILURE;
+            }
+
+            unsigned int idx = 0;
+
+            if (strcmp(argv[1],"auto") == 0)
+                idx = 0;
+            else
+            {
+                idx = -1;
+                sscanf(argv[1],"%d",&idx);
+            }
+
+
+            if (idx < 0 || idx > 14)
+            {
+                fprintf(stderr, "Invalid channel \"%s\"\n", argv[1]);
+                return EXIT_FAILURE;
+            }
+
+            if (idx != 0)
+                printf("Setting %d channel...\n",idx);
+            else
+                printf("Setting auto channel...\n");
+
+            usleep(LITLE_SLEEP);
+
+            if (a4_rf_set_channel(dev, idx) == A4_SUCCESS)
+                printf("Success.\n");
+            else
+            {
+                fprintf(stderr, "No channel number specified\n");
+                return EXIT_FAILURE;
+            }
+        }
+        else
+        {
+            fprintf(stderr, "Unknown option \"%s\"\n",argv[0]);
+            return EXIT_FAILURE;
+        }
+    }
+    else
+    {
+        fprintf(stderr, "No options specified\n");
+        return EXIT_FAILURE;
+    }
+
     return 0;
 }
 

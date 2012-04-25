@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
-	<File name="control_a4.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="2335" topLine="9" />
+	<File name="control_a4.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="1645" topLine="27" />
 	</File>
-	<File name="control_a4.h" open="1" top="0" tabpos="8">
+	<File name="control_a4.h" open="1" top="0" tabpos="7">
 		<Cursor position="87" topLine="0" />
 	</File>
 	<File name="dpis.cpp" open="1" top="0" tabpos="2">
@@ -14,12 +14,15 @@
 		<Cursor position="2671" topLine="116" />
 	</File>
 	<File name="pairing.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="14534" topLine="511" />
+		<Cursor position="14534" topLine="32" />
 	</File>
-	<File name="pairing.h" open="1" top="0" tabpos="7">
+	<File name="pairing.h" open="1" top="0" tabpos="6">
 		<Cursor position="1420" topLine="28" />
 	</File>
 	<File name="system_a4.cpp" open="1" top="0" tabpos="5">
-		<Cursor position="359" topLine="3" />
+		<Cursor position="246" topLine="0" />
+	</File>
+	<File name="system_a4.h" open="1" top="0" tabpos="8">
+		<Cursor position="113" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>

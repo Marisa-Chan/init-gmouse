@@ -49,7 +49,7 @@ int a4_rf_get_channel(a4_device *dev)
     int chan = oscar_map_channel[raw_chan];
 
     //0x80 bit - manual setted
-    return chan | (raw_chan & 0x80);
+    return chan | (ret[2] & 0x80);
 }
 
 int a4_rf_get_signal_level(a4_device *dev)
