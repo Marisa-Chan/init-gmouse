@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
-	<File name="control_a4.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="4880" topLine="177" />
+	<File name="control_a4.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="4023" topLine="155" />
 	</File>
 	<File name="control_a4.h" open="1" top="0" tabpos="7">
-		<Cursor position="1168" topLine="21" />
+		<Cursor position="512" topLine="15" />
 	</File>
-	<File name="dips.h" open="1" top="0" tabpos="11">
+	<File name="dips.h" open="1" top="0" tabpos="9">
 		<Cursor position="87" topLine="0" />
 	</File>
 	<File name="dpis.cpp" open="1" top="0" tabpos="2">

@@ -161,6 +161,12 @@ a4_wake_mode a4_wake_get_mode(a4_device *dev)
     tmp.time = ret[7] & 0x3F;
     tmp.type = ret[7] & 0xC0;
 
+    if ((tmp.type & 0x80) == 0x80)
+    {
+        tmp.time = 10;
+        tmp.type = A4_WAKE_BY_CLICK;
+    }
+
     return tmp;
 }
 
