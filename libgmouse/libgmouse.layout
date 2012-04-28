@@ -1,28 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
-	<File name="control_a4.cpp" open="1" top="1" tabpos="1">
-		<Cursor position="1645" topLine="27" />
+	<File name="control_a4.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="4880" topLine="177" />
 	</File>
 	<File name="control_a4.h" open="1" top="0" tabpos="7">
+		<Cursor position="1168" topLine="21" />
+	</File>
+	<File name="dips.h" open="1" top="0" tabpos="11">
 		<Cursor position="87" topLine="0" />
 	</File>
 	<File name="dpis.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="1287" topLine="13" />
+		<Cursor position="1" topLine="18" />
 	</File>
 	<File name="mouse_memory.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="2671" topLine="116" />
+		<Cursor position="1612" topLine="52" />
 	</File>
 	<File name="pairing.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="14534" topLine="32" />
+		<Cursor position="770" topLine="9" />
 	</File>
 	<File name="pairing.h" open="1" top="0" tabpos="6">
-		<Cursor position="1420" topLine="28" />
+		<Cursor position="1420" topLine="0" />
 	</File>
 	<File name="system_a4.cpp" open="1" top="0" tabpos="5">
-		<Cursor position="246" topLine="0" />
+		<Cursor position="2779" topLine="122" />
 	</File>
 	<File name="system_a4.h" open="1" top="0" tabpos="8">
-		<Cursor position="113" topLine="0" />
+		<Cursor position="584" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>

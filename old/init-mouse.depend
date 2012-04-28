@@ -169,8 +169,22 @@
 	<libusb-1.0/libusb.h>
 	<stdlib.h>
 
-1335326460 /home/marisa/git/init-gmouse/include/pairing.h
+1335345931 /home/marisa/git/init-gmouse/include/pairing.h
 	"system_a4.h"
 
 1335249354 /home/marisa/git/init-gmouse/include/mouse_memory.h
+
+1335581799 source:/home/marisa/git/init-gmouse/old/main.cpp
+	<stdio.h>
+	<stdlib.h>
+	"system_a4.h"
+	"control_a4.h"
+	"pairing.h"
+	<unistd.h>
+	<libusb-1.0/libusb.h>
+	<string.h>
+	"mouse_memory.h"
+
+1335515883 /home/marisa/git/init-gmouse/include/control_a4.h
+	"system_a4.h"
 

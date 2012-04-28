@@ -123,3 +123,32 @@ int a4_dump(a4_device *dev, const char *file)
 
     return A4_SUCCESS;
 }
+
+int a4_device_number(a4_device *dev)
+{
+    if (!dev)
+        return A4_ERROR;
+
+    unsigned short v = a4_mem_read_word(dev, 0x58F);
+
+    char v2 = v & 0xFF;
+
+    if ((v & 0xFF00) == 0xA400)
+    {
+        if ( v2 < 0 )
+            v2 = v2 + 255;
+        return (v2 & 0xF) + (10 * v2) / 16;
+    }
+    else
+    {
+        v = a4_mem_read_word(dev, 0x2701);
+        v2 = v & 0xFF;
+
+        if ( (v & 0xFF00) == 0xA400 )
+            return (v2 & 0xF) + (10 * v2) / 16;
+        else
+            return A4_ERROR;
+    }
+
+  return A4_ERROR;
+}

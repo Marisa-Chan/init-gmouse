@@ -14,7 +14,9 @@ typedef int (*func)(a4_device *dev, int argc, char *argv[]);
 
 int pair_func(a4_device *dev, int argc, char *argv[]);
 int channel_func(a4_device *dev, int argc, char *argv[]);
-
+int distance_func(a4_device *dev, int argc, char *argv[]);
+int wake_func(a4_device *dev, int argc, char *argv[]);
+int mrr_func(a4_device *dev, int argc, char *argv[]);
 
 
 struct funcs
@@ -36,9 +38,27 @@ static funcs functions[] =
     },
     {
         "channel",
-        "get | set <chan>",
+        "get | set chan",
         "chan - [1-14, 0-auto]",
         channel_func
+    },
+    {
+        "distance",
+        "get | set (15 | 20)",
+        NULL,
+        distance_func
+    },
+    {
+        "sleep",
+        "get | set wake_by time",
+        "wake_by=[click | move] time=3..10min",
+        wake_func
+    },
+    {
+        "mrr",
+        "get | set (125 | 250 | 500)",
+        NULL,
+        mrr_func
     },
     {
         NULL,
@@ -49,26 +69,235 @@ static funcs functions[] =
 };
 
 
+int mrr_func(a4_device *dev, int argc, char *argv[])
+{
+    if (argc > 0)
+    {
+        if (strcmp(argv[0],"get") == 0)
+        {
+            int mrr = a4_mrr_get(dev);
+
+            if (mrr == A4_ERROR)
+            {
+                fprintf(stderr, "IO Error\n");
+                return EXIT_FAILURE;
+            }
+
+            printf("Current MRR: %dHz\n", mrr);
+
+        }
+        else if (strcmp(argv[0],"set") == 0)
+        {
+            if (argc < 2)
+            {
+                fprintf(stderr, "No mrr specified\n");
+                return EXIT_FAILURE;
+            }
+
+            int mrr = 0;
+
+            mrr = -1;
+            sscanf(argv[1],"%d",&mrr);
+
+
+
+            if (mrr != 125 && mrr != 250 && mrr != 500)
+            {
+                fprintf(stderr, "Invalid mrr \"%s\"\n", argv[1]);
+                return EXIT_FAILURE;
+            }
+
+            printf("Setting mrr to %dHz...\n",mrr);
+
+            usleep(LITLE_SLEEP);
+
+            if (a4_mrr_set(dev, mrr) == A4_SUCCESS)
+                printf("Success.\n");
+            else
+            {
+                fprintf(stderr, "IO Error\n");
+                return EXIT_FAILURE;
+            }
+        }
+        else
+        {
+            fprintf(stderr, "Unknown option \"%s\"\n",argv[0]);
+            return EXIT_FAILURE;
+        }
+    }
+    else
+    {
+        fprintf(stderr, "No options specified\n");
+        return EXIT_FAILURE;
+    }
+
+    return 0;
+}
+
+int wake_func(a4_device *dev, int argc, char *argv[])
+{
+    if (argc > 0)
+    {
+        if (strcmp(argv[0],"get") == 0)
+        {
+            a4_wake_mode mod = a4_wake_get_mode(dev);
+
+            if (mod.type == A4_ERROR)
+            {
+                fprintf(stderr, "IO Error\n");
+                return EXIT_FAILURE;
+            }
+
+            printf("Sleep after: %d min, Wake by:", mod.time);
+
+            if (mod.type == A4_WAKE_BY_CLICK)
+                printf(" click\n");
+            else
+                printf(" move\n");
+        }
+        else if (strcmp(argv[0],"set") == 0)
+        {
+            if (argc < 3)
+            {
+                fprintf(stderr, "Options: <wake_by> <time>\n");
+                return EXIT_FAILURE;
+            }
+
+            a4_wake_mode mod;
+
+            if (strcmp(argv[1],"click") == 0)
+                mod.type = A4_WAKE_BY_CLICK;
+            else if (strcmp(argv[1],"move") == 0)
+                mod.type = A4_WAKE_BY_MOVE;
+            else
+            {
+                fprintf(stderr, "Incorrect value: \"%s\"\n",argv[1]);
+                return EXIT_FAILURE;
+            }
+
+
+            int time = 0;
+
+            sscanf(argv[2],"%d",&time);
+
+            if (time < 3 || time > 10)
+            {
+                fprintf(stderr, "Invalid time value: \"%s\"\n", argv[2]);
+                return EXIT_FAILURE;
+            }
+
+            printf("Setting sleep to %d min and wake by %s...\n",time,argv[1]);
+
+            usleep(LITLE_SLEEP);
+
+            mod.time = time;
+
+            if (a4_wake_set_mode(dev, mod) == A4_SUCCESS)
+                printf("Success.\n");
+            else
+            {
+                fprintf(stderr, "IO Error\n");
+                return EXIT_FAILURE;
+            }
+        }
+        else
+        {
+            fprintf(stderr, "Unknown option \"%s\"\n",argv[0]);
+            return EXIT_FAILURE;
+        }
+    }
+    else
+    {
+        fprintf(stderr, "No options specified\n");
+        return EXIT_FAILURE;
+    }
+
+    return 0;
+}
+
+
+int distance_func(a4_device *dev, int argc, char *argv[])
+{
+    if (argc > 0)
+    {
+        if (strcmp(argv[0],"get") == 0)
+        {
+            int dist = a4_rf_get_distance(dev);
+
+            if (dist == A4_ERROR)
+            {
+                fprintf(stderr, "IO Error\n");
+                return EXIT_FAILURE;
+            }
+
+            printf("Operate distance: %dm\n", dist);
+
+        }
+        else if (strcmp(argv[0],"set") == 0)
+        {
+            if (argc < 2)
+            {
+                fprintf(stderr, "No distance specified\n");
+                return EXIT_FAILURE;
+            }
+
+            int idx = 0;
+
+            idx = -1;
+            sscanf(argv[1],"%d",&idx);
+
+
+
+            if (idx != 15 && idx != 20)
+            {
+                fprintf(stderr, "Invalid distance \"%s\"\n", argv[1]);
+                return EXIT_FAILURE;
+            }
+
+            printf("Setting distance to %dm...\n",idx);
+
+            usleep(LITLE_SLEEP);
+
+            if (a4_rf_set_distance(dev, idx) == A4_SUCCESS)
+                printf("Success.\n");
+            else
+            {
+                fprintf(stderr, "IO Error\n");
+                return EXIT_FAILURE;
+            }
+        }
+        else
+        {
+            fprintf(stderr, "Unknown option \"%s\"\n",argv[0]);
+            return EXIT_FAILURE;
+        }
+    }
+    else
+    {
+        fprintf(stderr, "No options specified\n");
+        return EXIT_FAILURE;
+    }
+
+    return 0;
+}
+
 int channel_func(a4_device *dev, int argc, char *argv[])
 {
     if (argc > 0)
     {
         if (strcmp(argv[0],"get") == 0)
         {
-            int chn = a4_rf_get_channel(dev);
+            a4_rf_channel chn = a4_rf_get_channel(dev);
 
-            if (chn == A4_ERROR)
+            if (chn.type == A4_ERROR)
             {
                 fprintf(stderr, "IO Error\n");
                 return EXIT_FAILURE;
             }
 
-            bool manual = ((chn & 0x80) == 0x80);
-            int  channel = chn & 0x7F;
+            printf("Channel: %d", chn.channel);
 
-            printf("Channel: %d", channel);
-
-            if (manual)
+            if (chn.type == A4_CHAN_MANUAL)
                 printf(" manual\n");
             else
                 printf(" auto\n");
@@ -81,7 +310,7 @@ int channel_func(a4_device *dev, int argc, char *argv[])
                 return EXIT_FAILURE;
             }
 
-            unsigned int idx = 0;
+            int idx = 0;
 
             if (strcmp(argv[1],"auto") == 0)
                 idx = 0;
@@ -109,7 +338,7 @@ int channel_func(a4_device *dev, int argc, char *argv[])
                 printf("Success.\n");
             else
             {
-                fprintf(stderr, "No channel number specified\n");
+                fprintf(stderr, "IO Error\n");
                 return EXIT_FAILURE;
             }
         }
@@ -314,9 +543,9 @@ static void help_list_commands(void)
     while (pfnc->funct)
     {
         if (!pfnc->misc)
-            fprintf(stderr, "a4_tool %s <%s> \n", pfnc->func_name, pfnc->arg_desc);
+            fprintf(stderr, "a4_tool %s <%s>\n", pfnc->func_name, pfnc->arg_desc);
         else
-            fprintf(stderr, "a4_tool %s <%s> // %s \n", pfnc->func_name, pfnc->arg_desc,pfnc->misc);
+            fprintf(stderr, "a4_tool %s <%s>// %s\n", pfnc->func_name, pfnc->arg_desc,pfnc->misc);
         pfnc++;
     }
 }

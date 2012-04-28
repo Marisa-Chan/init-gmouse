@@ -32,9 +32,11 @@
 			<Add option="-w" />
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
+			<Add directory="../include" />
 		</Compiler>
 		<Linker>
-			<Add library="libgmouse/libgmouse.a" />
+			<Add option="-lusb-1.0" />
+			<Add library="../libgmouse/libgmouse.a" />
 		</Linker>
 		<Unit filename="main.cpp" />
 		<Extensions>

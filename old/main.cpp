@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "./include/system_a4.h"
-#include "./include/pairing.h"
+#include "system_a4.h"
+#include "control_a4.h"
+#include "pairing.h"
 
 #include <unistd.h>
 #include <libusb-1.0/libusb.h>
 #include <string.h>
-#include "./include/mouse_memory.h"
+#include "mouse_memory.h"
 
 
 //int set_unknown(libusb_device_handle *dev,unsigned short paging)
@@ -39,17 +40,11 @@
 //    return -1;
 //}
 //
-//int set_B613(libusb_device_handle *dev,unsigned short val)
+//int set_B613(a4_device *dev,unsigned short val)
 //{
 //    unsigned char ret[8];
 //
-//    int res = libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN, LIBUSB_REQUEST_GET_DESCRIPTOR,
-//                                               0xB613 , val, ret, 1, 0);
-//    if (res == 1)
-//        if (ret[0] == OSCAR_SUCCESS)
-//            return 0;
-//
-//    return -1;
+//    return a4_dongle_write(dev, 0xB616, val);
 //}
 //
 //
@@ -188,35 +183,72 @@ int main()
 
     if (dvs)
     {
-        a4_pair_devlist tt =  a4_pair_get_list_mouse(dvs);
-        a4_pair_devlist tt2 =  a4_pair_get_list_keyboard(dvs);
 
-        printf("Mouses:\n");
-        for (int i=0; i<5; i++)
+
+
+        unsigned char a[8];
+
+        for (int j=0; j<9; j++)
         {
-            if (tt.ID[i] != A4_PAIR_NONE)
-            {
-                if (tt.disabled[i] == A4_PAIR_STATE_ENABLE)
-                    printf("+ ");
-                else
-                    printf("- ");
-                printf("%.8x\n",tt.ID[i]);
-            }
+
+        a4_dongle_read(dvs,0xb600,j,a,8);
+
+        printf("%d: ",j);
+
+        for (int i=0; i<8 ; i++)
+            printf("%.2x ",a[i]);
+        printf("\n");
+
+        //sleep(1);
+
         }
-        printf("Keyboards:\n");
-        for (int i=0; i<5; i++)
-        {
-            if (tt2.ID[i] != A4_PAIR_NONE)
-            {
-                if (tt2.disabled[i] == A4_PAIR_STATE_ENABLE)
-                    printf("+ ");
-                else
-                    printf("- ");
-                printf("%.8x\n",tt2.ID[i]);
-            }
-        }
+        //set_B613(dvs,0xffff);
+
+//        for (int j=0; j<9; j++)
+//        {
+//
+//        a4_dongle_read(dvs,0xb600,j,a,8);
+//
+//        printf("%d: ",j);
+//
+//        for (int i=0; i<8 ; i++)
+//            printf("%.2x ",a[i]);
+//        printf("\n");
+//
+//        //sleep(1);
+//
+//        }
+
+       // a4_lock_mouse(dvs,A4_LOCK_OFF);
+
+//        while (true)
+//        {
+//            printf("%d\n",a4_profile_get(dvs));
+////        unsigned char a[8];
+////
+////        for (int j=0; j<8; j++)
+////        {
+////
+////        a4_dongle_read(dvs,0xb600,j,a,8);
+////
+////        printf("%d: ",j);
+////
+////        for (int i=0; i<8 ; i++)
+////            printf("%.2x ",a[i]);
+////        printf("\n");
+////
+//        sleep(1);
+////
+//        }
+//
+//        sleep(1);
+//
+//        }
+
+
+        a4_close_device(dvs);
     }
 
-    a4_close_device(dvs);
+
     return 0;
 }

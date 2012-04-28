@@ -1,4 +1,3 @@
-#include <inttypes.h>
 
 #define DPI_W_CNT  10
 #define DPI_H_CNT  10
@@ -6,7 +5,7 @@
 #define DPI_DEFAULT  0x0000
 
 
-const uint16_t dpi_opcodes[DPI_H_CNT][DPI_W_CNT] =
+const unsigned short dpi_opcodes[DPI_H_CNT][DPI_W_CNT] =
                                        {{0xC202,0xC204,0xC208,0xC20C,0x8210,0x8250,0x8290,0xC1CE,0x81D0,0xC1D4},
                                         {0xC402,0xC404,0xC408,0xC40C,0x8410,0x8450,0x8390,0xC2CE,0x82D0,0xC2D4},
                                         {0xC802,0xC804,0xC808,0xC80C,0x8810,0x8750,0x8690,0xC4CE,0x84D0,0xC4D4},
@@ -18,14 +17,14 @@ const uint16_t dpi_opcodes[DPI_H_CNT][DPI_W_CNT] =
                                         {0x50C1,0x50C2,0x50C4,0x50C6,0x50C8,0x50CA,0x50CC,0x50CE,0x10D0,0x50D4},
                                         {0xD4C1,0xD4C2,0xD4C4,0xD4C6,0xD4C8,0xD4CA,0xD4CC,0xD4CE,0x94D0,0xD4D4}};
 
-const int32_t dpi_sizes[DPI_H_CNT] = {100,200,400,600,800,1000,1200,1400,1600,2000};
+const int dpi_sizes[DPI_H_CNT] = {100,200,400,600,800,1000,1200,1400,1600,2000};
 
 
-uint16_t get_dpi(int8_t dpi_w, int8_t dpi_h)
+unsigned short get_dpi(int dpi_w, int dpi_h)
 {
-    uint16_t ret_dpi = DPI_DEFAULT;
+    unsigned short ret_dpi = DPI_DEFAULT;
 
-    int8_t w_index = -1;
+    int w_index = -1;
     for (int i=0; i< DPI_W_CNT; i++)
         if (dpi_w == dpi_sizes[i])
         {
@@ -33,7 +32,7 @@ uint16_t get_dpi(int8_t dpi_w, int8_t dpi_h)
             break;
         }
 
-    int8_t h_index = -1;
+    int h_index = -1;
     for (int i=0; i< DPI_H_CNT; i++)
         if (dpi_h == dpi_sizes[i])
         {

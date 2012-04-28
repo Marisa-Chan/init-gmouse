@@ -21,4 +21,6 @@ int a4_dongle_read(a4_device *dev, unsigned short address, unsigned short pin, v
 int a4_dongle_write(a4_device *dev, unsigned short addr_pin, unsigned short word);
 int a4_dump(a4_device *dev, const char *file);
 
+int a4_device_number(a4_device *dev);
+
 #endif // SYSTEM_A4_H_INCLUDED

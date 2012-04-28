@@ -17,8 +17,9 @@
 #define OSCAR_RF_CHANNEL_AUTO   0x0015
 
 static const uint8_t oscar_channels[15] = {OSCAR_RF_CHANNEL_AUTO, OSCAR_RF_CHANNEL_1,  OSCAR_RF_CHANNEL_2,  OSCAR_RF_CHANNEL_3,  OSCAR_RF_CHANNEL_4,
-                                           OSCAR_RF_CHANNEL_5,    OSCAR_RF_CHANNEL_6,  OSCAR_RF_CHANNEL_7,  OSCAR_RF_CHANNEL_8,  OSCAR_RF_CHANNEL_9,
-                                           OSCAR_RF_CHANNEL_10,   OSCAR_RF_CHANNEL_11, OSCAR_RF_CHANNEL_12, OSCAR_RF_CHANNEL_13, OSCAR_RF_CHANNEL_14};
+        OSCAR_RF_CHANNEL_5,    OSCAR_RF_CHANNEL_6,  OSCAR_RF_CHANNEL_7,  OSCAR_RF_CHANNEL_8,  OSCAR_RF_CHANNEL_9,
+        OSCAR_RF_CHANNEL_10,   OSCAR_RF_CHANNEL_11, OSCAR_RF_CHANNEL_12, OSCAR_RF_CHANNEL_13, OSCAR_RF_CHANNEL_14
+                                          };
 
 static const uint8_t oscar_map_channel[32] = {5, 4, 9, 4, 12, 5, 3, 13, 1, 6, 6, 7, 1, 11, 10, 12, 8, 1, 7, 13, 2, 14, 12, 5, 9, 14, 11, 14, 3, 8, 10, 2};
 
@@ -34,22 +35,30 @@ int a4_rf_set_channel(a4_device *dev, int channel)
     return A4_ERROR;
 }
 
-int a4_rf_get_channel(a4_device *dev)
+a4_rf_channel a4_rf_get_channel(a4_device *dev)
 {
+    a4_rf_channel tmp;
+    tmp.channel = A4_ERROR;
+    tmp.type = A4_ERROR;
+
     if (!dev)
-        return A4_ERROR;
+        return tmp;
+
 
     unsigned char ret[8];
     int res = a4_dongle_read(dev, 0xB600, 0x0004, ret, 8);
 
     if (res != 8)
-        return A4_ERROR;
+        return tmp;
 
     int raw_chan = ret[2] & 0x1F;
-    int chan = oscar_map_channel[raw_chan];
+    tmp.channel = oscar_map_channel[raw_chan];
+    if ((0x80 & ret[2]) == 0x80)
+        tmp.type = A4_CHAN_MANUAL;
+    else
+        tmp.type = A4_CHAN_AUTO;
 
-    //0x80 bit - manual setted
-    return chan | (ret[2] & 0x80);
+    return tmp;
 }
 
 int a4_rf_get_signal_level(a4_device *dev)
@@ -112,13 +121,13 @@ int a4_wake_set_mode(a4_device *dev, a4_wake_mode mode)
         return A4_ERROR;
 
     if (mode.type == A4_WAKE_BY_CLICK
-        ||
-        mode.type == A4_WAKE_BY_MOVE
+            ||
+            mode.type == A4_WAKE_BY_MOVE
 #ifdef A4_WAKE_BY_UNK
-        ||
-        mode.type == A4_WAKE_BY_UNK
+            ||
+            mode.type == A4_WAKE_BY_UNK
 #endif
-        )
+       )
     {
         //same with oscar editor
         if (mode.time > 0x0a)
@@ -167,9 +176,10 @@ int a4_lock_mouse(a4_device *dev, unsigned short lock)
     return A4_ERROR;
 }
 
-#define OSCAR_MRR_500HZ       0x0002
-#define OSCAR_MRR_250HZ       0x0004
-#define OSCAR_MRR_125HZ       0x0008
+#define OSCAR_MRR_1000HZ       0x0001
+#define OSCAR_MRR_500HZ        0x0002
+#define OSCAR_MRR_250HZ        0x0004
+#define OSCAR_MRR_125HZ        0x0008
 
 int a4_mrr_set(a4_device *dev, unsigned short mrr)
 {
@@ -184,6 +194,8 @@ int a4_mrr_set(a4_device *dev, unsigned short mrr)
             mrr = OSCAR_MRR_250HZ;
         else if (mrr == 500)
             mrr = OSCAR_MRR_500HZ;
+        else if (mrr == 1000)
+            mrr = OSCAR_MRR_1000HZ;
 
         return a4_dongle_write(dev, 0xB60F , mrr);
     }
@@ -207,6 +219,8 @@ int a4_mrr_get(a4_device *dev)
         return 250;
     else if (ret[7] == OSCAR_MRR_125HZ)
         return 125;
+    else if (ret[7] == OSCAR_MRR_1000HZ)
+        return 1000;
 
     return A4_ERROR;
 }
@@ -253,7 +267,7 @@ int a4_btnmask_set(a4_device *dev,unsigned short mask)
     return A4_ERROR;
 }
 
-unsigned short a4_btnmask_get(a4_device *dev)
+int a4_btnmask_get(a4_device *dev)
 {
     if (!dev)
         return A4_ERROR;
@@ -265,4 +279,188 @@ unsigned short a4_btnmask_get(a4_device *dev)
         return A4_ERROR;
 
     return ((ret[2] << 8) | ret[1]);
+}
+
+int a4_power_mouse_get(a4_device *dev)
+{
+    if (!dev)
+        return A4_ERROR;
+
+    unsigned char ret[8];
+    int res = a4_dongle_read(dev, 0xB600, 0x0004, ret, 8);
+
+    if (res != 8)
+        return A4_ERROR;
+
+    if (ret[7] & 0x80)
+    {
+        switch (ret[7] & 0x7F)
+        {
+        case 0x3F:
+            return 100;
+        case 0x3E:
+            return 90;
+        case 0x3D:
+            return 80;
+        case 0x3C:
+            return 70;
+        case 0x3B:
+            return 60;
+        case 0x3A:
+            return 50;
+        case 0x39:
+            return 40;
+        case 0x38:
+            return 30;
+        case 0x37:
+            return 25;
+        case 0x36:
+            return 20;
+        case 0x35:
+            return 10;
+        default:
+            return 0;
+        }
+    }
+    else
+    {
+        switch (ret[7])
+        {
+        case 0x32:
+        case 0x33:
+        case 0x34:
+        case 0x35:
+        case 0x36:
+        case 0x37:
+        case 0x38:
+        case 0x39:
+        case 0x3A:
+        case 0x3B:
+        case 0x3C:
+        case 0x3D:
+        case 0x3E:
+        case 0x3F:
+            return 100;
+        case 0x31:
+            return 90;
+        case 0x30:
+            return 85;
+        case 0x2F:
+            return 80;
+        case 0x2E:
+            return 75;
+        case 0x2D:
+            return 65;
+        case 0x2C:
+            return 60;
+        case 0x2B:
+            return 55;
+        case 0x2A:
+            return 30;
+        case 0x29:
+            return 25;
+        case 0x28:
+            return 20;
+        case 0x27:
+            return 15;
+        case 0x26:
+            return 5;
+        default:
+            return 0;
+        }
+    }
+
+    return 0;
+}
+
+int a4_power_keybd_get(a4_device *dev)
+{
+    if (!dev)
+        return A4_ERROR;
+
+    unsigned char ret[8];
+    int res = a4_dongle_read(dev, 0xB600, 0x0004, ret, 8);
+
+    if (res != 8)
+        return A4_ERROR;
+
+    if (ret[6] & 0x80)
+    {
+        switch (ret[6] & 0x7F)
+        {
+        case 0x3F:
+            return 100;
+        case 0x3E:
+            return 90;
+        case 0x3D:
+            return 80;
+        case 0x3C:
+            return 70;
+        case 0x3B:
+            return 60;
+        case 0x3A:
+            return 50;
+        case 0x39:
+            return 40;
+        case 0x38:
+            return 30;
+        case 0x37:
+            return 25;
+        case 0x36:
+            return 20;
+        case 0x35:
+            return 10;
+        default:
+            return 0;
+        }
+    }
+    else
+    {
+        switch (ret[6])
+        {
+        case 0x32:
+        case 0x33:
+        case 0x34:
+        case 0x35:
+        case 0x36:
+        case 0x37:
+        case 0x38:
+        case 0x39:
+        case 0x3A:
+        case 0x3B:
+        case 0x3C:
+        case 0x3D:
+        case 0x3E:
+        case 0x3F:
+            return 100;
+        case 0x31:
+            return 90;
+        case 0x30:
+            return 85;
+        case 0x2F:
+            return 80;
+        case 0x2E:
+            return 75;
+        case 0x2D:
+            return 65;
+        case 0x2C:
+            return 60;
+        case 0x2B:
+            return 55;
+        case 0x2A:
+            return 30;
+        case 0x29:
+            return 25;
+        case 0x28:
+            return 20;
+        case 0x27:
+            return 15;
+        case 0x26:
+            return 5;
+        default:
+            return 0;
+        }
+    }
+
+    return 0;
 }
