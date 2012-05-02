@@ -2,7 +2,11 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
 	<File name="control_a4.cpp" open="1" top="1" tabpos="1">
+<<<<<<< HEAD
+		<Cursor position="7103" topLine="318" />
+=======
 		<Cursor position="4023" topLine="155" />
+>>>>>>> 1d8b22e81fd60da9da176008a0e43c8c46e06fc3
 	</File>
 	<File name="control_a4.h" open="1" top="0" tabpos="7">
 		<Cursor position="512" topLine="15" />
@@ -14,7 +18,7 @@
 		<Cursor position="1" topLine="18" />
 	</File>
 	<File name="mouse_memory.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="1612" topLine="52" />
+		<Cursor position="3244" topLine="124" />
 	</File>
 	<File name="pairing.cpp" open="1" top="0" tabpos="4">
 		<Cursor position="770" topLine="9" />
@@ -23,9 +27,9 @@
 		<Cursor position="1420" topLine="0" />
 	</File>
 	<File name="system_a4.cpp" open="1" top="0" tabpos="5">
-		<Cursor position="2779" topLine="122" />
+		<Cursor position="2725" topLine="100" />
 	</File>
 	<File name="system_a4.h" open="1" top="0" tabpos="8">
-		<Cursor position="584" topLine="0" />
+		<Cursor position="568" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>

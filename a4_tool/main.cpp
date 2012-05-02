@@ -17,6 +17,10 @@ int channel_func(a4_device *dev, int argc, char *argv[]);
 int distance_func(a4_device *dev, int argc, char *argv[]);
 int wake_func(a4_device *dev, int argc, char *argv[]);
 int mrr_func(a4_device *dev, int argc, char *argv[]);
+int bat_func(a4_device *dev, int argc, char *argv[]);
+int sig_func(a4_device *dev, int argc, char *argv[]);
+int prof_func(a4_device *dev, int argc, char *argv[]);
+int dump_func(a4_device *dev, int argc, char *argv[]);
 
 
 struct funcs
@@ -61,12 +65,152 @@ static funcs functions[] =
         mrr_func
     },
     {
+        "profile",
+        "get | set (1 | 2 |3 |4 | 5)",
+        NULL,
+        prof_func
+    },
+    {
+        "bat",
+        "",
+        NULL,
+        bat_func
+    },
+    {
+        "siglevel",
+        "",
+        NULL,
+        sig_func
+    },
+    {
+        "dump",
+        "file",
+        NULL,
+        dump_func
+    },
+    {
         NULL,
         NULL,
         NULL,
         NULL
     }
 };
+
+int prof_func(a4_device *dev, int argc, char *argv[])
+{
+    if (argc > 0)
+    {
+        if (strcmp(argv[0],"get") == 0)
+        {
+            int prof = a4_profile_get(dev);
+
+            if (prof == A4_ERROR)
+            {
+                fprintf(stderr, "IO Error\n");
+                return EXIT_FAILURE;
+            }
+
+            printf("Current profile: %d\n", prof+1);
+        }
+        else if (strcmp(argv[0],"set") == 0)
+        {
+            if (argc < 2)
+            {
+                fprintf(stderr, "No profile number specified\n");
+                return EXIT_FAILURE;
+            }
+
+            int prof = 0;
+
+            prof = -1;
+            sscanf(argv[1],"%d",&prof);
+
+            prof--;
+
+
+            if (prof < 0 || prof > 4)
+            {
+                fprintf(stderr, "Invalid profile number \"%s\"\n", argv[1]);
+                return EXIT_FAILURE;
+            }
+
+            printf("Setting profile to %d...\n",prof+1);
+
+            usleep(LITLE_SLEEP);
+
+            if (a4_profile_set(dev, prof) == A4_SUCCESS)
+                printf("Success.\n");
+            else
+            {
+                fprintf(stderr, "IO Error\n");
+                return EXIT_FAILURE;
+            }
+        }
+        else
+        {
+            fprintf(stderr, "Unknown option \"%s\"\n",argv[0]);
+            return EXIT_FAILURE;
+        }
+    }
+    else
+    {
+        fprintf(stderr, "No options specified\n");
+        return EXIT_FAILURE;
+    }
+
+    return 0;
+}
+
+int sig_func(a4_device *dev, int argc, char *argv[])
+{
+    printf("Signal level: %d%%\n", (int)((255.0 - (float)a4_rf_get_signal_level(dev)) / 2.55) );
+
+    return 0;
+}
+
+int last = -1;
+
+void progress_print(int prog)
+{
+    if (((prog % 10) == 0) && (prog != last))
+    {
+        last = prog;
+        printf("%d %%\n",prog);
+    }
+}
+
+int dump_func(a4_device *dev, int argc, char *argv[])
+{
+    if (argc > 0)
+    {
+        if(a4_dump(dev,argv[0],progress_print) == A4_SUCCESS)
+            printf("Success\n");
+        else
+            printf("Fail\n");
+    }
+    else
+    {
+        fprintf(stderr, "No file specified\n");
+        return EXIT_FAILURE;
+    }
+
+    return 0;
+}
+
+int bat_func(a4_device *dev, int argc, char *argv[])
+{
+    if (a4_device_mouse_count(dev) > 0)
+        printf("Mouse bat: %d%%\n",a4_power_mouse_get(dev));
+    else
+        printf("No mouses found.\n");
+
+    if (a4_device_keybd_count(dev) > 0)
+        printf("Keyboard bat: %d%%\n",a4_power_keybd_get(dev));
+    else
+        printf("No keyboards found.\n");
+
+    return 0;
+}
 
 
 int mrr_func(a4_device *dev, int argc, char *argv[])

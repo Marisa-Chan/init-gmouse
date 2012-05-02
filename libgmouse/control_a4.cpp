@@ -332,20 +332,11 @@ int a4_power_mouse_get(a4_device *dev)
     {
         switch (ret[7])
         {
-        case 0x32:
-        case 0x33:
-        case 0x34:
-        case 0x35:
-        case 0x36:
-        case 0x37:
-        case 0x38:
-        case 0x39:
-        case 0x3A:
-        case 0x3B:
-        case 0x3C:
-        case 0x3D:
-        case 0x3E:
-        case 0x3F:
+        case 0x32: case 0x33: case 0x34:
+        case 0x35: case 0x36: case 0x37:
+        case 0x38: case 0x39: case 0x3A:
+        case 0x3B: case 0x3C: case 0x3D:
+        case 0x3E: case 0x3F:
             return 100;
         case 0x31:
             return 90;
@@ -424,20 +415,11 @@ int a4_power_keybd_get(a4_device *dev)
     {
         switch (ret[6])
         {
-        case 0x32:
-        case 0x33:
-        case 0x34:
-        case 0x35:
-        case 0x36:
-        case 0x37:
-        case 0x38:
-        case 0x39:
-        case 0x3A:
-        case 0x3B:
-        case 0x3C:
-        case 0x3D:
-        case 0x3E:
-        case 0x3F:
+        case 0x32: case 0x33: case 0x34:
+        case 0x35: case 0x36: case 0x37:
+        case 0x38: case 0x39: case 0x3A:
+        case 0x3B: case 0x3C: case 0x3D:
+        case 0x3E: case 0x3F:
             return 100;
         case 0x31:
             return 90;

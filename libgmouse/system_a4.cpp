@@ -1,5 +1,6 @@
 #include "system_a4.h"
 #include "mouse_memory.h"
+#include "pairing.h"
 #include <unistd.h>
 #include <stdio.h>
 
@@ -104,7 +105,7 @@ int a4_dongle_write(a4_device *dev, unsigned short addr_pin, unsigned short word
     return A4_ERROR;
 }
 
-int a4_dump(a4_device *dev, const char *file)
+int a4_dump(a4_device *dev, const char *file, void (*progress)(int))
 {
     if (!dev)
         return A4_ERROR;
@@ -115,7 +116,7 @@ int a4_dump(a4_device *dev, const char *file)
 
     unsigned short *buf[0x4000];
 
-    a4_mem_read_block(dev,0,0x4000,buf,NULL);
+    a4_mem_read_block(dev,0,0x4000,buf,progress);
 
     fwrite(buf,0x4000,2,f);
 
@@ -151,4 +152,38 @@ int a4_device_number(a4_device *dev)
     }
 
   return A4_ERROR;
+}
+
+int a4_id_check(unsigned int id)
+{
+    if (((0xFF7FFFFF & id) != (id & 0x7FFFF)) || id == 0x00FFFFFF || id == 0 || id == 0xFFFFFFFF)
+        return A4_ERROR;
+
+    return A4_SUCCESS;
+}
+
+int a4_device_keybd_count(a4_device *dev)
+{
+    a4_pair_devlist list = a4_pair_get_list_keyboard(dev);
+
+    int cnt = 0;
+
+    for (int i=0; i < 5; i++)
+        if (a4_id_check(list.ID[i]) == A4_SUCCESS)
+            cnt++;
+
+    return cnt;
+}
+
+int a4_device_mouse_count(a4_device *dev)
+{
+    a4_pair_devlist list = a4_pair_get_list_mouse(dev);
+
+    int cnt = 0;
+
+    for (int i=0; i < 5; i++)
+        if (a4_id_check(list.ID[i]) == A4_SUCCESS)
+            cnt++;
+
+    return cnt;
 }

@@ -91,12 +91,22 @@ int a4_mem_read_block(a4_device *dev, unsigned short addr, unsigned short words_
     int big   = words_sz / 4;
     int small = words_sz % 4;
 
+    float pone = 1.0;
+    if (big > 0)
+        pone = 100.0 / big;
+
+    float ptwo = 0;
+
     for(int i = 0; i < big; i++)
     {
         int res = a4_dongle_read(dev, 0xB501, addr + (i*4), sbuf + (i*4), 8);
 
         if (res != 8)
             return A4_ERROR;
+
+        ptwo += pone;
+        if (progress != NULL)
+            progress(ptwo);
     }
 
     for(int i = 0; i < small; i++)
@@ -107,10 +117,13 @@ int a4_mem_read_block(a4_device *dev, unsigned short addr, unsigned short words_
             return A4_ERROR;
     }
 
+    if ( progress != NULL)
+        progress(100);
+
     return A4_SUCCESS;
 }
 
-int a4_mem_write_block(a4_device *dev, unsigned short addr, unsigned short words_sz, void *inbuf)
+int a4_mem_write_block(a4_device *dev, unsigned short addr, unsigned short words_sz, void *inbuf, void (*progress)(int))
 {
     if (!dev)
         return A4_ERROR;
@@ -123,11 +136,19 @@ int a4_mem_write_block(a4_device *dev, unsigned short addr, unsigned short words
 
     int error = A4_SUCCESS;
 
+    float pone = 1.0;
+    if (to_write > 0)
+        pone = 100.0 / to_write;
+
+    float ptwo = 0;
+
     for (int i=0; i < to_write && error == A4_SUCCESS; i++)
     {
         unsigned int k = i;
         if ((k & 0xFFFFFF80) == k)
         {
+            if ( progress != NULL)
+                progress(ptwo);
             //printf("set page 0x%x\n",addr + i);
             error = a4_mem_erase_block(dev,addr + k);
         }
@@ -142,7 +163,12 @@ int a4_mem_write_block(a4_device *dev, unsigned short addr, unsigned short words
             //printf("mouse_move_block to 0x%x\n",((addr + i) & 0xFFFFFFE0) | 0x8000 );
             error = a4_mem_mov_block(dev, ((addr + i) & 0xFFFFFFE0) | 0x8000 );
         }
+
+        ptwo += pone;
     }
+
+    if ( progress != NULL)
+        progress(100);
 
     return error;
 }
