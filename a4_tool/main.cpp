@@ -21,6 +21,7 @@ int bat_func(a4_device *dev, int argc, char *argv[]);
 int sig_func(a4_device *dev, int argc, char *argv[]);
 int prof_func(a4_device *dev, int argc, char *argv[]);
 int dump_func(a4_device *dev, int argc, char *argv[]);
+int multifunc_func(a4_device *dev, int argc, char *argv[]);
 
 
 struct funcs
@@ -89,12 +90,31 @@ static funcs functions[] =
         dump_func
     },
     {
+        "init",
+        "",
+        "switch multifunctional button",
+        multifunc_func
+    },
+    {
         NULL,
         NULL,
         NULL,
         NULL
     }
 };
+
+int multifunc_func(a4_device *dev, int argc, char *argv[])
+{
+    if (a4_btnmask_set(dev,0xFFBF) == A4_SUCCESS)
+        printf("Success\n");
+    else
+    {
+        fprintf(stderr,"IO Error\n");
+        return EXIT_FAILURE;
+    }
+
+    return 0;
+}
 
 int prof_func(a4_device *dev, int argc, char *argv[])
 {
