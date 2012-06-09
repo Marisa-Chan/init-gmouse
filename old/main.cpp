@@ -188,6 +188,9 @@ int main()
 
         unsigned char a[8];
 
+        a4_profile_set(dvs,0);
+
+
         for (int j=0; j<9; j++)
         {
 
@@ -202,6 +205,24 @@ int main()
         //sleep(1);
 
         }
+
+        a4_profile_set(dvs,0);
+
+        for (int j=0; j<9; j++)
+        {
+
+        a4_dongle_read(dvs,0xb600,j,a,8);
+
+        printf("%d: ",j);
+
+        for (int i=0; i<8 ; i++)
+            printf("%.2x ",a[i]);
+        printf("\n");
+
+        //sleep(1);
+
+        }
+
         //set_B613(dvs,0xffff);
 
 //        for (int j=0; j<9; j++)

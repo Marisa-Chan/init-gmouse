@@ -25,5 +25,10 @@ a4_tool siglevel                                   // get RF-signal level
 a4_tool dump <file>                                // dump dongle memory to file
 a4_tool init                                       // switch multifunctional button
 
+
+Power checker:
+Copy files from "power_check" into /usr/share/a4_tool and a4_tool binary to /usr/bin.
+Add power_checker.sh to crontab and it will check current power and send notify if power less 50%
+
 TODO:
 profile configuring and scripts parser
