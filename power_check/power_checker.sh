@@ -1,7 +1,7 @@
 #!/bin/sh
 
 PROG="a4_tool"
-disp="0"
+disp=":0"
 progdir=".a4_tool"
 base_path="/usr"
 
