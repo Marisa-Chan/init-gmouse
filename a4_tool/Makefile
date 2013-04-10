@@ -16,12 +16,13 @@ RANLIB = ranlib
 WINDRES = windres
 
 INC =  -I../include
-CFLAGS =  -Wall -fexceptions
+CFLAGS =  -Wall -fexceptions 
+CFLAGS += `pkg-config --cflags libusb-1.0`
 RESINC = 
 RCFLAGS = 
 LIBDIR = 
 LIB =  ../libgmouse/libgmouse.a
-LDFLAGS =  -lusb-1.0
+LDFLAGS = `pkg-config --libs libusb-1.0`
 
 INC_DEBUG =  $(INC)
 CFLAGS_DEBUG =  $(CFLAGS) -g

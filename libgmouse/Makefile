@@ -16,12 +16,12 @@ RANLIB = ranlib
 WINDRES = windres
 
 INC = 
-CFLAGS = 
+CFLAGS = `pkg-config --cflags libusb-1.0`
 RESINC = 
 RCFLAGS = 
 LIBDIR = 
 LIB = 
-LDFLAGS = 
+LDFLAGS = `pkg-config --libs libusb-1.0`
 
 INC_DEBUG =  $(INC)
 CFLAGS_DEBUG =  $(CFLAGS) -Wall -g
