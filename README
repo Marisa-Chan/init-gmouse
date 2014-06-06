@@ -30,5 +30,12 @@ Power checker:
 Copy files from "power_check" into /usr/share/a4_tool and a4_tool binary to /usr/bin.
 Add power_checker.sh to crontab and it will check current power and send notify if power less 50%
 
+
+Udev and user permissions:
+cp udev/10-a4tech-usb-devices.rules /etc/udev/rules.d/
+groupadd gmouse
+useradd -G gmouse YOUR_USER_NAME
+
+
 TODO:
 profile configuring and scripts parser
