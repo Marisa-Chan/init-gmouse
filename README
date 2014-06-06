@@ -27,8 +27,8 @@ a4tool init                                       // switch multifunctional butt
 
 
 Power checker:
-Copy files from "power_check" into /usr/share/a4_tool and a4_tool binary to /usr/bin.
-Add power_checker.sh to crontab and it will check current power and send notify if power less 50%
+Copy files from "a4_toold" into /usr/share/a4_toold and a4_tool binary to /usr/bin.
+Add a4_toold.sh to user DE/WM autorun, after copy a4_toold.conf to /etc/ and configure it.
 
 
 Udev and user permissions:
