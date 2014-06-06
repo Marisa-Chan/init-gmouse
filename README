@@ -8,22 +8,22 @@ Do not use the code from "old" folder, it's only for development and testing and
 BUILD:
 cd libgmouse
 make
-cd ../a4_tool
+cd ../a4tool
 make
 
 
 Usage:
 
-a4_tool pair <list | new | del <ID> | disable <ID> | enable <ID>>  // pairing with another g-mouses and keyboards
-a4_tool channel <get | set chan>                   // chan - [1-14, 0-auto]
-a4_tool distance <get | set (15 | 20)>             // operating distance
-a4_tool sleep <get | set wake_by time>             // wake_by=[click | move] time=3..10min
-a4_tool mrr <get | set (125 | 250 | 500)>          // read rate
-a4_tool profile <get | set (1 | 2 |3 |4 | 5)>
-a4_tool bat                                        // get mouse and keyboard bat level
-a4_tool siglevel                                   // get RF-signal level
-a4_tool dump <file>                                // dump dongle memory to file
-a4_tool init                                       // switch multifunctional button
+a4tool pair <list | new | del <ID> | disable <ID> | enable <ID>>  // pairing with another g-mouses and keyboards
+a4tool channel <get | set chan>                   // chan - [1-14, 0-auto]
+a4tool distance <get | set (15 | 20)>             // operating distance
+a4tool sleep <get | set wake_by time>             // wake_by=[click | move] time=3..10min
+a4tool mrr <get | set (125 | 250 | 500)>          // read rate
+a4tool profile <get | set (1 | 2 |3 |4 | 5)>
+a4tool bat                                        // get mouse and keyboard bat level
+a4tool siglevel                                   // get RF-signal level
+a4tool dump <file>                                // dump dongle memory to file
+a4tool init                                       // switch multifunctional button
 
 
 Power checker:
