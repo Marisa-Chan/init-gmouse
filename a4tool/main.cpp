@@ -707,9 +707,9 @@ static void help_list_commands(void)
     while (pfnc->funct)
     {
         if (!pfnc->misc)
-            fprintf(stderr, "a4_tool %s <%s>\n", pfnc->func_name, pfnc->arg_desc);
+            fprintf(stderr, "a4tool %s <%s>\n", pfnc->func_name, pfnc->arg_desc);
         else
-            fprintf(stderr, "a4_tool %s <%s>// %s\n", pfnc->func_name, pfnc->arg_desc,pfnc->misc);
+            fprintf(stderr, "a4tool %s <%s>// %s\n", pfnc->func_name, pfnc->arg_desc,pfnc->misc);
         pfnc++;
     }
 }
