@@ -16,13 +16,12 @@ RANLIB = ranlib
 WINDRES = windres
 
 INC =  -I../include
-CFLAGS =  -Wall -fexceptions 
-CFLAGS += `pkg-config --cflags libusb-1.0`
+CFLAGS =  -Wall -fexceptions
 RESINC = 
 RCFLAGS = 
-LIBDIR = 
+LIBDIR = `pkg-config --libs libusb-1.0`
 LIB =  ../libgmouse/libgmouse.a
-LDFLAGS = `pkg-config --libs libusb-1.0`
+LDFLAGS =  `pkg-config --cflags libusb-1.0`
 
 INC_DEBUG =  $(INC)
 CFLAGS_DEBUG =  $(CFLAGS) -g
@@ -82,7 +81,7 @@ after_Release:
 Release: before_Release out_Release after_Release
 
 out_Release: $(OBJ_RELEASE) $(DEP_RELEASE)
-	$(LD) $(LDFLAGS_RELEASE) $(LIBDIR_RELEASE) -o $(OUT_RELEASE) $(OBJ_RELEASE) $(LIB_RELEASE)
+	$(LD) $(LDFLAGS_RELEASE) -o $(OUT_RELEASE) $(OBJ_RELEASE) $(LIB_RELEASE) $(LIBDIR_RELEASE)
 
 $(OBJDIR_RELEASE)/main.o: main.cpp
 	$(CPP) $(CFLAGS_RELEASE) $(INC_RELEASE) -c -o $(OBJDIR_RELEASE)/main.o main.cpp
@@ -93,4 +92,3 @@ clean_Release:
 	rm -rf $(OBJDIR_RELEASE)
 
 .PHONY: before_Debug after_Debug clean_Debug before_Release after_Release clean_Release
-
