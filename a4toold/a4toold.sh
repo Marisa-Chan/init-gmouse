@@ -2,7 +2,7 @@
 # Writed by TimofeyTitovets <nefelim4ag@gmail.com> 2014
 
 ################################################################################
-# a4_tool daemon, for checking battery state
+# a4tool daemon, for checking battery state
 # Setting values duplicated in script for more clarity
 ################################################################################
 export MB_FIFO=(100 100)  KB_FIFO=(100 100)
@@ -11,7 +11,7 @@ battery_check() { # $1 device name
         Mouse)    FIFO=(${MB_FIFO[@]}) ;;
         Keyboard) FIFO=(${KB_FIFO[@]}) ;;
     esac
-    FIFO=( ${FIFO[@]} `a4_tool bat | grep -i $1 | tr -d '[%,a-z,A-Z,:, ]'` )
+    FIFO=( ${FIFO[@]} `a4tool bat | grep -i $1 | tr -d '[%,a-z,A-Z,:, ]'` )
     if [ ! -z ${FIFO[$B_FIFO_S]} ]; then # if size > max, del first element
         FIFO[0]="" FIFO=(${FIFO[@]})
     fi
@@ -26,11 +26,11 @@ battery_check() { # $1 device name
     BL_A=$[$BL_A/${#FIFO[@]}]
 
     echo  $BL_A > $work_dir/$1/bat &
-    echo `a4_tool mrr get  | awk '{print $3}'`        > $work_dir/mrr &
-    echo `a4_tool siglevel | tr -d '[%,a-z,A-Z,:, ]'` > $work_dir/siglevel &
+    echo `a4tool mrr get  | awk '{print $3}'`        > $work_dir/mrr &
+    echo `a4tool siglevel | tr -d '[%,a-z,A-Z,:, ]'` > $work_dir/siglevel &
 }
 
-. /etc/a4_toold.conf || exec echo Config not exist
+. /etc/a4toold.conf || exec echo Config not exist
 
 for n in Keyboard Mouse; do
     mkdir -p $work_dir/$n/
@@ -38,7 +38,7 @@ done
 
 while true; do
     for dev in Mouse Keyboard; do
-        dev=`a4_tool bat | grep -i $dev | grep -e '[0-9]'`
+        dev=`a4tool bat | grep -i $dev | grep -e '[0-9]'`
         [ ! -z "$dev" ] && battery_check $dev
     done
     sleep $B_FIFO_P
@@ -59,7 +59,7 @@ notify(){ # $1 - name of the device (Mouse | Keyboard)
             NC=`cat $work_dir/$1/NC_$val`  # NC - notify counts
             if [[ $NC -le $NC_max ]]; then
                 echo $[$NC+1] > $work_dir/$1/NC_$val &
-                notify-send -i /usr/share/a4_toold/$1.png "$1 battery level ${BL}% less than: ${val}%" &
+                notify-send -i /usr/share/a4tool/$1.png "$1 battery level ${BL}% less than: ${val}%" &
                 break
             fi
         else
