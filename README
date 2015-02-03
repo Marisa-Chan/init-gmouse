@@ -27,8 +27,8 @@ a4tool init                                       // switch multifunctional butt
 
 
 Power checker:
-Copy files from "a4_toold" into /usr/share/a4_toold and a4_tool binary to /usr/bin.
-Add a4_toold.sh to user DE/WM autorun, after copy a4_toold.conf to /etc/ and configure it.
+Copy files from "a4toold" into /usr/share/a4tool and a4tool binary to /usr/bin.
+Add a4toold.sh to user DE/WM autorun, after copy a4toold.conf to /etc/ and configure it.
 
 
 Udev and user permissions:
